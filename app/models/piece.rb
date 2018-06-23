@@ -119,6 +119,35 @@ class Piece < ApplicationRecord
     puts "This method needs to be defined in the piece's Unique Class;\ne.g. for the Queen piece, edit the Queen Class in queen.rb"
   end
 
+  def can_be_captured(piece)
+    friendlies = pieces.active.where(white: !piece.white)
+    friendlies.each do |friendly|
+      if friendly.valid_move?(piece.location_x, piece.location_y)
+        return piece
+      end
+  end
+
+  def can_be_blocked?(king)
+    obstruct_locations = []
+    range = (-1..1)
+    range.each do |i|
+      range.each do |j|
+        next if [i,j] == [0,0]
+        obstruct_locations << [king.location_x+i,king.location_y+j]
+      end
+    end
+
+    friendlies = pieces.active.where(white: !piece.white)
+    obstruct_locations.each do |location|
+      friendlies.each do |friendly|
+        if friendly.valid_move?(location[0], location[1])
+          true
+        else
+          false
+        end
+      end
+    end
+  end
 
 
   def move_to!(new_x,new_y)
