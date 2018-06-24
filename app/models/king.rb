@@ -15,6 +15,19 @@ class King < Piece
     return true
   end
 
+  def can_escape_check?
+    range = (-1..1)
+    range.each do |x|
+      range.each do |y|
+        if valid_move(x, y) && threatening_pieces.valid_move?
+           return true
+        else
+          return false
+        end
+      end
+    end
+  end
+
   def castle!(rook_x, rook_y, has_moved)
     rook = game.pieces.find_by(location_x: rook_x, location_y: rook_y)
 
