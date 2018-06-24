@@ -4,6 +4,7 @@ FactoryBot.define do
     location_x {rand(0..7)}
     location_y {rand(0..7)}
     white :true
+    has_moved :false
     association :game
   end
 

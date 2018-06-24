@@ -8,6 +8,27 @@ class Piece < ApplicationRecord
     destination_on_board?(x,y)
   end
 
+  def opponent_piece?(x,y)
+    piece_at_x_y = game.pieces.find_by(location_x: x, location_y: y)
+    return false if piece_at_x_y && (self.white == piece_at_x_y.white)
+    return true
+  end
+
+  def move_to!(new_x,new_y)
+    piece_at_x_y = game.pieces.find_by(location_x: new_x, location_y: new_y)
+
+    if self.valid_move?(new_x, new_y)
+      if piece_at_x_y
+        if opponent_piece?(new_x, new_y)
+          piece_at_x_y.update_attributes!(notcaptured: false, location_x: nil, location_y: nil)
+          self.update_attributes!(location_x: new_x, location_y: new_y, has_moved: true)
+        end
+      else
+        self.update_attributes!(location_x: new_x, location_y: new_y, has_moved: true)
+      end
+    end
+  end
+
   def is_opponent?(piece)
     piece.white # == white
   end
@@ -64,47 +85,56 @@ class Piece < ApplicationRecord
   end
 
   def d_obs?(x,y)
-    if (self.location_x < x) && (self.location_y < y) && (x-self.location_x == y-self.location_y)
-      a = self.location_x
-      b = self.location_y
-      until (a == x) && (b == y)
-        a = a.next
-        b = b.next
-        if game.pieces.find_by(location_x: a, location_y: b)
-          return true
+    a = self.location_x
+    b = self.location_y
+
+    if (a-x).abs == (b-y).abs # moves same number of spaces on both axes
+
+      if (a<x) && (b<y)
+        # bottom-right direction
+        while (a < x-1)
+          a = a.next
+          b = b.next
+          if game.pieces.find_by(location_x: a, location_y: b)
+            return true
+          end
         end
       end
-    elsif (self.location_x < x) && (self.location_y > y) && (x-self.location_x == self.location_y-y)
-      a = self.location_x
-      b = self.location_y
-      until (a == x) && (b == y)
-        a = a.next
-        b = b.pred
-        if game.pieces.find_by(location_x: a, location_y: b)
-          return true
+
+      if (a<x) && (b>y)
+        # top-right direction
+        while (a < x-1)
+          a = a.next
+          b = b.pred
+          if game.pieces.find_by(location_x: a, location_y: b)
+            return true
+          end
         end
       end
-    elsif (self.location_x > x) && (self.location_y < y) && (self.location_x-x == y-self.location_y)
-      a = self.location_x
-      b = self.location_y
-      until (a == x) && (b == y)
-        a = a.pred
-        b = b.next
-        if game.pieces.find_by(location_x: a, location_y: b)
-          return true
+
+      if (a>x) && (b<y)
+        # bottom-left direction
+        while (b < y-1)
+          a = a.pred
+          b = b.next
+          if game.pieces.find_by(location_x: a, location_y: b)
+            return true
+          end
         end
       end
-    elsif (self.location_x > x) && (self.location_y > y) && (self.location_x-x == self.location_y-y)
-      a = self.location_x
-      b = self.location_y
-      until (a == x) && (b == y)
-        a = a.pred
-        b = b.pred
-        if game.pieces.find_by(location_x: a, location_y: b)
-          return true
+
+      if (a>x) && (b>y)
+        # top-left direction
+        while (b > y+1)
+          a = a.pred
+          b = b.pred
+          if game.pieces.find_by(location_x: a, location_y: b)
+            return true
+          end
         end
       end
     end
+    return false
   end
 
 

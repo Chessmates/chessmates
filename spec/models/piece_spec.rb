@@ -127,10 +127,20 @@ RSpec.describe Piece, type: :model do
   end
 
   it "makes all moves invalid when the game state is forfeited" do
-    piece = FactoryBot.create(:piece, {location_x: 4, location_y: 2})
-    piece.game.forfeited!
+    game = FactoryBot.create(:game)
+    game.pieces.where(type: "Pawn").destroy_all
 
-    expect(piece.valid_move?(4,5)).to be false
+    rook = game.pieces.find_by(location_x: 0, location_y: 0)
+    knight = game.pieces.find_by(location_x: 1, location_y: 0)
+    bishop = game.pieces.find_by(location_x: 2, location_y: 0)
+    queen = game.pieces.find_by(location_x: 4, location_y: 0)
+
+    game.forfeited!
+
+    expect(rook.valid_move?(0,2)).to be false
+    expect(knight.valid_move?(2,2)).to be false
+    expect(bishop.valid_move?(4,2)).to be false
+    expect(queen.valid_move?(0,4)).to be false
   end
 
   # MOVE_TO! METHOD TESTS: END = = = = = = = = = = = = = = = = = = = = = = = = 
@@ -140,6 +150,5 @@ RSpec.describe Piece, type: :model do
     allow(piece).to receive(:valid_move)
     expect(piece).to receive(:move_to!).with(3,4).and_return(:valid_move?)
     piece.move_to!(3,4)
-
   end
 end

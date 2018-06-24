@@ -35,4 +35,11 @@ RSpec.describe Game, type: :model do
 
     expect(game.active?).to be true
   end
+
+  it "is forfeitable when it has two players" do
+    black_player = FactoryBot.create(:white_player)
+    game = FactoryBot.create(:game, { black_player_id: black_player.id })
+
+    expect(game.forfeitable?).to be true
+  end
 end

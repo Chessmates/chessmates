@@ -3,36 +3,30 @@ require 'rails_helper'
 RSpec.describe King, type: :model do
 
   # King_Movement Tests: START =============
-  it "shouldn't allow a movement other than 1 place at a time" do
+  it "shouldn't allow moves greater than 1 place at a time" do
     game = FactoryBot.create(:game)
-    piece1 = King.create(location_x: 2, location_y: 7, game_id: game.id)
-    piece1.save!
-    piece1.valid_move?(2,9)
-    expect(piece1.valid_move?(2,9)).to be false
+    king = King.create(location_x: 4, location_y: 3, game_id: game.id)
+
+    expect(king.valid_move?(2,3)).to be false # horizontal
+    expect(king.valid_move?(2,5)).to be false # true diagonal
+    expect(king.valid_move?(1,5)).to be false # false diagonal
+    expect(king.valid_move?(4,5)).to be false # vertical
   end
 
-  it "should allow a movement of 1 place at a time" do
+  it "should allow vertical, horizontal or diagonal moves of 1 place at a time" do
     game = FactoryBot.create(:game)
-    piece1 = King.create(location_x: 2, location_y: 7, game_id: game.id)
-    piece1.save!
-    piece1.valid_move?(2,6)
-    expect(piece1.valid_move?(2,6)).to be true
+    king = King.create(location_x: 4, location_y: 3, game_id: game.id)
+   
+   expect(king.valid_move?(5,3)).to be true # horizontal
+   expect(king.valid_move?(5,2)).to be true # true diagonal
+   expect(king.valid_move?(4,2)).to be true # vertical
   end
 
-  it "should allow diagonal moves of 1 place at a time" do
+  it "shouldn't allow moves outside the chessboard" do
     game = FactoryBot.create(:game)
-    piece1 = King.create(location_x: 3, location_y: 5, game_id: game.id)
-    piece1.save!
-    piece1.valid_move?(2,4)
-    expect(piece1.valid_move?(2,4)).to be true
-  end
-
-  it "shouldn't allow moves outside the 8x8 table" do
-    game = FactoryBot.create(:game)
-    piece1 = King.create(location_x: 1, location_y: 1, game_id: game.id)
-    piece1.save!
-    piece1.valid_move?(9,9)
-    expect(piece1.valid_move?(9,9)).to be false
+    king = King.create(location_x: 7, location_y: 3, game_id: game.id)
+    
+    expect(king.valid_move?(8,3)).to be false
   end
   # King_Movement Tests: END =============
 

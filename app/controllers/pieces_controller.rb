@@ -20,9 +20,9 @@ class PiecesController < ApplicationController
     return render_not_found if piece.blank?
 
     if piece.white
-      return render_not_found(:forbidden) if current_user == piece.game.black_player 
+      return render_not_found(:forbidden) if current_user != piece.game.white_player 
     else
-      return render_not_found(:forbidden) if current_user == piece.game.white_player
+      return render_not_found(:forbidden) if current_user != piece.game.black_player
     end
 
     piece.update_attributes(piece_params)
@@ -38,12 +38,12 @@ class PiecesController < ApplicationController
       return render_not_found(:forbidden) if current_user == piece.game.white_player
     end
 
-    piece.castle!(params[:rook_x],params[:rook_y])
+    piece.castle!(params[:rook_x],params[:rook_y],params[:has_moved])
   end
 
   private
 
   def piece_params
-    params.require(:piece).permit(:game_id, :location_x, :location_y, :white)
+    params.require(:piece).permit(:game_id, :location_x, :location_y, :has_moved)
   end
 end
