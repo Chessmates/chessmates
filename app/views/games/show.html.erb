@@ -1,27 +1,80 @@
+<!-- Display "JOIN" button if Game has no Black Player -->
 <h3><%= @game.game_name %></h3>
+<% if @game.black_player.nil?  %>
 <%= link_to 'Join Game', game_path(@game), method: :patch, class: 'btn btn-primary' %>
-
-<% if current_user && current_user == @game.white_player %>
-  <%= link_to 'Delete Game', game_path(@game), method: :delete, data: {confirm: 'Are you SURE you want to delete this game?'}, class: 'btn btn-danger' %>
 <% end %>
 
+<!-- Display Game Status  -->
+<% if @game.state %>
+  <h3>Game Status: <%= @game.state %></h3>
+<% else %>
+  <h3>Game Status: undefined</h3>
+<% end %>
+
+<!-- Display "DELETE GAME" button to Game Creator -->
+<% if current_user && current_user == @game.white_player %>
+  <%= link_to 'Delete Your Game', game_path(@game), method: :delete, data: {confirm: 'Are you SURE you want to DELETE your game?'}, class: 'btn btn-danger' %>
+<% end %>
+<br /><br />
+
+<!-- Display Username of Game Players -->
+<% if @game.white_player %>
+  White Player: <%= @game.white_player.username %><br />
+<% else %>
+  White Player: NONE <br />
+<% end %>
+<% if @game.black_player %>
+  Black Player: <%= @game.black_player.username %>
+<% else %>
+  Black Player: NONE
+<% end %>
+<br />
+
+<!-- Display Button to Forfeit Game -->
+<% if !@game.forfeited? && @game.forfeitable? %>
+  <%= link_to 'Forfeit Game', forfeit_game_path(@game), method: :patch, data: {confirm: 'Are you SURE you want to FORFEIT this game?'}, class: 'btn btn-danger' %>
+<% end %>
+
+<!-- GAME CHESSBOARD -->
 <div class="chessboard">
   <% (0..7).each do |col| %>
     <% (0..7).each do |row| %>
-      <% @piece = @game.pieces.find_by(location_x: row, location_y: col) %>
+      <% @piece = @game.pieces_by_col_then_row[col][row] %>
         <% if @piece.nil? %>
           <% if ((row % 2 == 0) && (col % 2 == 0)) || ((row % 2 != 0) && (col % 2 != 0)) %>
-            <div class="white"><%= @piece %></div>
+            <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"></div>
           <% else %>
-            <div class="black"><%= @piece %></div>
+            <div class="black droppable" data-x="<%= row %>" data-y="<%= col %>"></div>
           <% end %>
         <% else %>
           <% if ((row % 2 == 0) && (col % 2 == 0)) || ((row % 2 != 0) && (col % 2 != 0)) %>
-            <div class="white"><%= link_to @piece.type.chars[0], game_piece_path(@game.id, @piece.id) %></div>
+            <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable" data-piece="<%= @piece.id %>"><%= @piece.picture.html_safe %></span></div>
           <% else %>
-            <div class="black"><%= link_to @piece.type.chars[0], game_piece_path(@game.id, @piece.id) %></div>
+            <div class="black droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable" data-piece="<%= @piece.id %>"><%= @piece.picture.html_safe %></span></div>
           <% end %>
         <% end %>
     <% end %>
   <% end %>
 </div>
+
+<% white_king = @game.pieces.find_by(location_x: 3, location_y: 0, type: "King", white: true) %>
+<% black_king = @game.pieces.find_by(location_x: 3, location_y: 7, type: "King", white: false) %>
+
+<% if current_user %>
+  <% if current_user == @game.white_player && white_king %>
+    <% if white_king.can_castle?(0,0) %>
+      <%= link_to 'Kingside Castle - White Player', castle_game_piece_path(@game, white_king.id, rook_x: 0, rook_y: 0), method: :patch, class: 'btn btn-info ks-white' %>
+    <% end %>
+    <% if white_king.can_castle?(7,0) %>
+      <%= link_to 'Queenside Castle - White Player', castle_game_piece_path(@game, white_king.id, rook_x: 7, rook_y: 0), method: :patch, class: 'btn btn-info qs-white' %>
+    <% end %>
+  <% elsif current_user == @game.black_player && black_king %>
+    <% if black_king.can_castle?(0,7) %>
+      <%= link_to 'Kingside Castle - Black Player', castle_game_piece_path(@game, black_king.id, rook_x: 0, rook_y: 7), method: :patch, class: 'btn btn-info ks-black' %>
+    <% end %>
+    <% if black_king.can_castle?(7,7) %>
+      <%= link_to 'Queenside Castle - Black Player', castle_game_piece_path(@game, black_king.id, rook_x: 7, rook_y: 7), method: :patch, class: 'btn btn-info qs-black' %>
+    <% end %>
+  <% end %>
+<% end %>
+

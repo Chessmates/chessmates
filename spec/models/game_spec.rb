@@ -16,37 +16,23 @@ RSpec.describe Game, type: :model do
   it "will generate all chess pieces when created" do
     game = FactoryBot.create(:game)
 
-    isWhiteRook = game.pieces.find_by(location_x: 0, location_y: 0)
-    isBlackPawn = game.pieces.find_by(location_x: 4, location_y: 6)
-    isWhitePawn = game.pieces.find_by(location_x: 0, location_y: 1)
-    isBlackBishop = game.pieces.find_by(location_x: 2, location_y: 7)
-    isBlackRook = game.pieces.find_by(location_x: 0, location_y: 7)
-    isWhiteKing = game.pieces.find_by(location_x: 3, location_y: 0)
-    isBlackQueen = game.pieces.find_by(location_x: 4, location_y: 7)
+    whiteRookLeft = game.pieces_by_col_then_row[0][0]
+    blackRookRight = game.pieces_by_col_then_row[7][7]
+
+    expect(whiteRookLeft.white).to be true
+    expect(whiteRookLeft.type).to eq("Rook")
+
+    expect(blackRookRight.white).to be false 
+    expect(blackRookRight.type).to eq("Rook")
 
     expect(game.pieces.count).to eq(32)
     expect(game.pieces.where(white: true).count).to eq(16)
     expect(game.pieces.where(white: false).count).to eq(16)
+  end
 
-    expect(isWhiteRook.type).to eq("Rook")
-    expect(isWhiteRook.white).to be true
+  it "will have a status of 'active' when created" do
+    game = FactoryBot.create(:game)
 
-    expect(isBlackPawn.type).to eq("Pawn")
-    expect(isBlackPawn.white).to be false
-
-    expect(isWhitePawn.type).to eq("Pawn")
-    expect(isWhitePawn.white).to be true
-
-    expect(isBlackBishop.type).to eq("Bishop")
-    expect(isBlackBishop.white).to be false
-
-    expect(isBlackRook.type).to eq("Rook")
-    expect(isBlackRook.white).to be false
-
-    expect(isWhiteKing.type).to eq("King")
-    expect(isWhiteKing.white).to be true
-
-    expect(isBlackQueen.type).to eq("Queen")
-    expect(isBlackQueen.white).to be false
+    expect(game.active?).to be true
   end
 end

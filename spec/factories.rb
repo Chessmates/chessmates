@@ -46,6 +46,7 @@ FactoryBot.define do
     sequence :game_name do |a|
       "Game#{a}"
     end
+    state :active
     association :white_player
   end
 end

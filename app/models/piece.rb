@@ -4,11 +4,12 @@ class Piece < ApplicationRecord
   scope :active, -> { where(notcaptured: true) }
 
   def valid_move?(x,y)
+    return false if self.game.forfeited?
     destination_on_board?(x,y)
   end
 
   def is_opponent?(piece)
-    piece.white == white
+    piece.white # == white
   end
 
 
@@ -16,17 +17,14 @@ class Piece < ApplicationRecord
     [x,y].all? { |e| (e >= 0) && (e <= 7) }
   end
 
-
-  def is_obstructed?(x,y) #checking if obstructed in any direction
-    v_obs?(x,y) || h_obs?(x,y) || d_obs?(x,y) || invalid(x,y)
+  def is_obstructed?(x,y)
+    v_obs?(x,y) || h_obs?(x,y) || d_obs?(x,y)
   end
-
-
 
   def v_obs?(x,y)
     if (self.location_y < y) && (self.location_x == x)
       count = self.location_y
-      until count == y
+      while count < (y - 1)
         count = count.next
         if game.pieces.find_by(location_x: x, location_y: count)
           return true
@@ -34,7 +32,7 @@ class Piece < ApplicationRecord
       end
     elsif (self.location_y > y) && (self.location_x == x)
       count = self.location_y
-      until count == y
+      while count > (y + 1)
         count = count.pred
         if game.pieces.find_by(location_x: x, location_y: count)
           return true
@@ -44,12 +42,10 @@ class Piece < ApplicationRecord
     return false
   end
 
-
-
   def h_obs?(x,y)
     if (self.location_x < x) && (self.location_y == y)
       count = self.location_x
-      until count == x
+      while count < (x - 1)
         count = count.next
         if game.pieces.find_by(location_x: count, location_y: y)
           return true
@@ -57,7 +53,7 @@ class Piece < ApplicationRecord
       end
     elsif (self.location_x > x) && (self.location_y == y)
       count = self.location_x
-      until count == x
+      while count > (x + 1)
         count = count.pred
         if game.pieces.find_by(location_x: count, location_y: y)
           return true
@@ -66,8 +62,6 @@ class Piece < ApplicationRecord
     end
     return false
   end
-
-
 
   def d_obs?(x,y)
     if (self.location_x < x) && (self.location_y < y) && (x-self.location_x == y-self.location_y)
@@ -153,13 +147,16 @@ class Piece < ApplicationRecord
   def move_to!(new_x,new_y)
     dest = game.pieces.find_by(location_x: new_x, location_y: new_y)
 
-    if dest.nil?
-      self.update_attributes(location_x: new_x, location_y: new_y)
-    elsif dest.white != self.white
+    if !self.valid_move?(new_x, new_y)
+      return "Can't Move There"
+    elsif dest.nil?
+      self.update_attributes(location_x: new_x, location_y: new_y, has_moved: true)
+    elsif dest.white != self.white # Checking if destination has an enemy_piece. Maybe pull into own method.
       dest.update_attributes(notcaptured: false, location_x: nil, location_y: nil)
-      self.update_attributes(location_x: new_x, location_y: new_y)
+      self.update_attributes(location_x: new_x, location_y: new_y, has_moved: true)
     else
-      return "ERROR! Cannot move there; occupied by a friendly piece"
+      return "ERROR! Cannot move there; occupied by your team's piece"
     end
   end
+
 end
