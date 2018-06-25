@@ -16,3 +16,19 @@ p.alert {
 }
 
 
+.homepage {
+  background: image_url('background.jpg') no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+
+}
+
+.title {
+  color: #ffffff;
+}
+
+.subtitle {
+  color: #ffffff;
+}
