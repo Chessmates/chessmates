@@ -132,7 +132,7 @@ RSpec.describe GamesController, type: :controller do
       sign_in user
 
       post :create, params: { game: { game_name: 'ChessKing' } }
-      expect(response).to redirect_to root_path
+      expect(response).to redirect_to games_path
 
       game = Game.last
       expect(game.game_name).to eq('ChessKing')
