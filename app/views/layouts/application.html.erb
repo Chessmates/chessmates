@@ -6,28 +6,26 @@
 
     <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-    <link href="https://fonts.googleapis.com/css?family=Heebo:900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Heebo:900|Lato:300i|Montserrat:300i" rel="stylesheet">
   </head>
 
   <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="#">
-        <img src="/chessmates/app/images/rook.png" width="30" height="30" class="d-inline-block align-top" alt=""> ChessMates
-      </a>
-      <%= link_to (image_tag 'logo.png', style: 'height:auto;width:35%;'), root_path %>
+      <%=link_to 'CHESSMATES', root_path, class: 'navbar-brand' %>
 
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div class="collapse navbar-collapse ml-auto w-100 justify-content-end text-white bg-dark" id="navbarSupportedContent">
         <% if current_user %>
           Hello, <%= current_user.username %>!&nbsp;&nbsp;&nbsp;
           <%= link_to 'New Game', new_game_path %>
           <%= link_to 'Sign Out', destroy_user_session_path, method: :delete %>
         <% else %>
-          <%= link_to 'Sign In', new_user_session_path %>
-          <%= link_to 'Sign Up', new_user_registration_path %>
+          <%= link_to 'Log In', new_user_session_path, class: "btn btn-primary" %>&nbsp;&nbsp; or &nbsp;&nbsp;
+          <br/>
+          <%= link_to 'Sign Up', new_user_registration_path, class: "btn btn-success" %>
         <% end %>
       </div>
     </nav>
@@ -42,5 +40,6 @@
     <%= yield %>
 
     <br /><br /><br /><br />
+
   </body>
 </html>
