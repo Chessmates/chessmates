@@ -29,8 +29,11 @@ h3 {
     text-align: center;
 }
 
-.games-list {
+.games-list h3 {
     padding-top: 80px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    font-size: 100px;
 }
 
 .card-deck {
@@ -41,4 +44,8 @@ h3 {
 
 .card-body {
     text-align: center;
+}
+
+.game-creator {
+    font-size: 18px;
 }
