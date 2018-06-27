@@ -6,7 +6,7 @@ class King < Piece
 
   def valid_path?(x,y)
     current_x = self.location_x
-    current_y = self.location_y 
+    current_y = self.location_y
     (x - current_x).abs <= 1 && (y - current_y).abs <= 1
   end
 
@@ -17,6 +17,19 @@ class King < Piece
     # return false if game.check?(self.white)
     return false if self.h_obs?(rook_x, rook_y)
     return true
+  end
+
+  def can_escape_check?
+    range = (-1..1)
+    range.each do |x|
+      range.each do |y|
+        if valid_move(x, y) && threatening_pieces.valid_move?
+           return true
+        else
+          return false
+        end
+      end
+    end
   end
 
   def castle!(rook_x, rook_y, has_moved)

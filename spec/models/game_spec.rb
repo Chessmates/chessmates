@@ -22,7 +22,7 @@ RSpec.describe Game, type: :model do
     expect(whiteRookLeft.white).to be true
     expect(whiteRookLeft.type).to eq("Rook")
 
-    expect(blackRookRight.white).to be false 
+    expect(blackRookRight.white).to be false
     expect(blackRookRight.type).to eq("Rook")
 
     expect(game.pieces.count).to eq(32)
@@ -42,4 +42,31 @@ RSpec.describe Game, type: :model do
 
     expect(game.forfeitable?).to be true
   end
+  ### CHECKMATE TESTS ###
+  it "should be in check" do
+    setup_game_and_king
+    setup_check
+    expect(@game.checkmate?(@black_king.white)).to be true
+  end
+
+  private
+  def setup_game_and_king
+    black_player = FactoryBot.create(:white_player)
+    @game = FactoryBot.create(:game, { black_player_id: black_player.id })
+    @black_king = @game.pieces.find_by(type:'King', white:false)
+  end
+
+  def setup_check
+    setup_game_and_king
+    @white_pawn = @game.pieces.find_by(type:'Pawn', white:true, location_x: 4)
+    @white_pawn.update_attributes(location_y: 2, has_moved: true)
+    @white_pawn.reload
+    @black_pawn = @game.pieces.find_by(type:'Pawn', white:false, location_x: 5)
+    @black_pawn.update_attributes(location_y: 6, has_moved: true)
+    @black_pawn.reload
+    @white_queen = @game.pieces.find_by(type:'Queen', white:true)
+    @white_queen.update_attributes(location_x: 7, location_y: 4, has_moved: true)
+    @white_queen.reload
+  end
+
 end
