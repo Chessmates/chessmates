@@ -17,6 +17,8 @@ class PiecesController < ApplicationController
     dest_x = params[:piece][:location_x].to_i
     dest_y = params[:piece][:location_y].to_i
 
+    logger.debug "Valid Move? #{piece.valid_move?(dest_x,dest_y)}"
+
     return render_not_found(:forbidden) if !piece.valid_move?(dest_x,dest_y)
 
     piece.move_to!(dest_x,dest_y)
