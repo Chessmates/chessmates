@@ -9,7 +9,7 @@ class King < Piece
   def valid_path?(x,y)
     current_x = self.location_x
     current_y = self.location_y
-    (x - current_x).abs == 1 || (y - current_y).abs == 1
+    (x - current_x).abs <= 1 && (y - current_y).abs <= 1
   end
 
   def can_escape_check?
