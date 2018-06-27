@@ -90,25 +90,29 @@ RSpec.describe Piece, type: :model do
 
   it "captures the opponent's piece on the intended destination, then assumes that position" do
     game = FactoryBot.create(:game)
+    game.pieces.find_by(location_x: 0, location_y: 1).destroy
+    game.pieces.find_by(location_x: 0, location_y: 6).destroy
     whiteRook = game.pieces.find_by(location_x:0, location_y: 0)
-    dest = game.pieces.find_by(location_x: 7, location_y: 7) # this is blackRook
+    dest = game.pieces.find_by(location_x: 0, location_y: 7) # this is blackRook
 
-    whiteRook.move_to!(7,7)
+    whiteRook.move_to!(0,7)
+    whiteRook.reload
     dest.reload
    
     expect(dest.notcaptured).to be false
-    expect(whiteRook.location_x).to eq(7)
+    expect(dest.location_x).to be nil
+    expect(dest.location_y).to be nil
+    expect(whiteRook.location_x).to eq(0)
     expect(whiteRook.location_y).to eq(7) 
   end
 
-  it "generates an error message if a piece's destination is occupied by a friendly" do
+  it "cannot assume new position if a piece's destination is occupied by own piece" do
     game = FactoryBot.create(:game)
     whiteRook = game.pieces.find_by(location_x:0, location_y: 0)
     dest = game.pieces.find_by(location_x: 7, location_y: 1)
 
     whiteRook.move_to!(7,1)
 
-    expect(whiteRook.move_to!(7,1)).to eq("ERROR! Cannot move there; occupied by a friendly piece")
     expect(dest.notcaptured).to be true
     expect(whiteRook.location_x).to eq(0)
     expect(whiteRook.location_y).to eq(0) 
@@ -116,17 +120,16 @@ RSpec.describe Piece, type: :model do
 
   it "updates the piece's position to [new_x, new_y] if the intended destination is empty" do
     game = FactoryBot.create(:game)
-    whiteRook = game.pieces.find_by(location_x:0, location_y: 0)
-    dest = game.pieces.find_by(location_x: 3, location_y: 3)
+    game.pieces.find_by(location_x: 0, location_y: 1).destroy
+    whiteRook = game.pieces.find_by(location_x: 0, location_y: 0)
     
-    whiteRook.move_to!(3,3)
+    whiteRook.move_to!(0,3)
 
-    expect(dest).to be_nil
-    expect(whiteRook.location_x).to eq(3)
+    expect(whiteRook.location_x).to eq(0)
     expect(whiteRook.location_y).to eq(3) 
   end
 
-  it "makes all moves invalid when the game state is forfeited" do
+  it "returns all moves as invalid when the game state is forfeited" do
     game = FactoryBot.create(:game)
     game.pieces.where(type: "Pawn").destroy_all
 

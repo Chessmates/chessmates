@@ -84,13 +84,23 @@ RSpec.describe PiecesController, type: :controller do
       sign_in game.white_player
       pawn = game.pieces.find_by(location_x: 0, location_y: 1)
 
+      expect(pawn.has_moved).to be false
+
       patch :update, params: { game_id: game.id, id: pawn.id, piece: { location_x: 0, location_y: 2, has_moved: true } }
       pawn.reload
 
-      puts pawn.inspect
+      expect(pawn.has_moved).to be true
+    end
 
-      # expect(pawn.has_moved).to be false
-      # expect(pawn.has_moved).to be true
+    it "should return a Forbidden(403) error if the piece's move is invalid" do
+      whiteRook = FactoryBot.create(:piece, location_x: 0, location_y: 2)
+      sign_in whiteRook.game.white_player
+
+      patch :update, params: { game_id: whiteRook.game.id, id: whiteRook.id, piece: { location_x: 2, location_y: 4, has_moved: true } }
+
+      puts response.status
+
+      # expect(response).to have_http_status(:forbidden)
     end
   end
 end

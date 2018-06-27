@@ -4,17 +4,6 @@ class PiecesController < ApplicationController
   def create
   end
 
-  def show
-    @piece = Piece.find_by_id(params[:id])
-    return render_not_found if @piece.blank?
-
-    if @piece.white
-      return render_not_found(:forbidden) if current_user != @piece.game.white_player
-    else
-      return render_not_found(:forbidden) if current_user != @piece.game.black_player
-    end
-  end
-
   def update
     piece = Piece.find_by_id(params[:id])
     return render_not_found if piece.blank?
@@ -24,6 +13,11 @@ class PiecesController < ApplicationController
     else
       return render_not_found(:forbidden) if current_user != piece.game.black_player
     end
+
+    dest_x = params[:piece][:location_x].to_i
+    dest_y = params[:piece][:location_y].to_i
+
+    return render_not_found(:forbidden) if !piece.valid_move?(dest_x,dest_y)
 
     piece.update_attributes(piece_params)
   end

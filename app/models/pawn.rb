@@ -29,8 +29,8 @@ class Pawn < Piece
     diagonal_move?(dest_x, dest_y)
   end
 
-  def has_moved?
-    white ? location_y == 1 : location_y == 6
-  end
+  # def has_moved?
+  #   white ? location_y == 1 : location_y == 6
+  # end
 
 end

@@ -44,7 +44,8 @@ RSpec.describe GamesController, type: :controller do
       patch :forfeit, params: {id: game.id, game: { state: :forfeited }}
       
       expect(game.forfeited?).to be true
-      # expect(flash[:notice]).to eq "You have forfeited the game."
+      expect(flash[:notice]).to eq "You have forfeited the game."
+      expect(response).to redirect_to game_path
     end
 
     it "should allow the black player to forfeit a game" do
@@ -52,10 +53,12 @@ RSpec.describe GamesController, type: :controller do
       bplayer = FactoryBot.create(:white_player)
       game.black_player_id = bplayer.id
       sign_in game.black_player
-      patch :forfeit, params: {id: game.id, game: { state: 'forfeited' }}
+
+      patch :forfeit, params: {id: game.id, game: { state: :forfeited }}
 
       expect(flash[:notice]).to eq "You have forfeited the game."
       expect(game.forfeited?).to be true
+      expect(response).to redirect_to game_path
     end
   end
 
