@@ -1,9 +1,13 @@
 FactoryBot.define do
+  factory :turn do
+    
+  end
 
   factory :piece do
     location_x {rand(0..7)}
     location_y {rand(0..7)}
     white :true
+    has_moved :false
     association :game
   end
 
@@ -46,6 +50,7 @@ FactoryBot.define do
     sequence :game_name do |a|
       "Game#{a}"
     end
+    state :active
     association :white_player
   end
 end

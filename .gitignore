@@ -15,3 +15,12 @@
 
 # Ignore Byebug command history file.
 .byebug_history
+
+# Ignore RubyMine cache files
+.idea/**/workspace.xml
+.idea/**/chessmates.iml
+.idea/**.rakeTasks
+.idea/**/inspectionProfiles/Project_Default.xml
+.idea/**/misc.xml
+.idea/**/modules.xml
+.idea/**/vcs.xml

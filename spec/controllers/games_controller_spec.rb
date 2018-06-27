@@ -1,6 +1,64 @@
 require 'rails_helper'
 
 RSpec.describe GamesController, type: :controller do
+  
+  describe "games#forfeit action" do
+    it "shouldn't allow unauthenticated users forfeit a game" do
+      game = FactoryBot.create(:game)
+      patch :forfeit, params: {id: game.id, game: { state: 'forfeited' }}
+
+      expect(response).to redirect_to new_user_session_path
+    end
+
+    it "should return a 404:Not_Found error is the game cannot be found" do
+      game = FactoryBot.create(:game)
+      sign_in game.white_player
+      patch :forfeit, params: {id: 'booboo', game: { state: 'forfeited' }}
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "shouldn't allow a game with just one player to be forfeited" do
+      game = FactoryBot.create(:game)
+      sign_in game.white_player
+      patch :forfeit, params: {id: game.id, game: { state: 'forfeited' }}
+
+      expect(flash[:alert]).to eq "You cannot forfeit this game."
+      expect(game.forfeited?).to be false
+    end
+
+    it "shouldn't allow a user who is not a player to forfeit the game" do
+      game = FactoryBot.create(:game)
+      nonPlayer = FactoryBot.create(:white_player)
+      sign_in nonPlayer
+      patch :forfeit, params: {id: game.id, game: { state: 'forfeited' }}
+
+      expect(flash[:alert]).to eq "You cannot forfeit this game."
+      expect(game.forfeited?).to be false
+    end
+
+    it "should allow the white player to forfeit a game" do
+      game = FactoryBot.create(:game)
+      sign_in game.white_player
+
+      patch :forfeit, params: {id: game.id, game: { state: :forfeited }}
+      
+      expect(game.forfeited?).to be true
+      # expect(flash[:notice]).to eq "You have forfeited the game."
+    end
+
+    it "should allow the black player to forfeit a game" do
+      game = FactoryBot.create(:game)
+      bplayer = FactoryBot.create(:white_player)
+      game.black_player_id = bplayer.id
+      sign_in game.black_player
+      patch :forfeit, params: {id: game.id, game: { state: 'forfeited' }}
+
+      expect(flash[:notice]).to eq "You have forfeited the game."
+      expect(game.forfeited?).to be true
+    end
+  end
+
   describe "games#index action" do
     it "should successfully show the page" do
       get :index
@@ -10,7 +68,7 @@ RSpec.describe GamesController, type: :controller do
 
   describe "games#update action" do
 
-    it "shouldn't allow unauthenticated users to join a game as the black player" do
+    it "shouldn't allow unauthenticated users to join a game" do
       game = FactoryBot.create(:game)
       user2 = FactoryBot.create(:white_player)
 
