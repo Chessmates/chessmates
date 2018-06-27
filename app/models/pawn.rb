@@ -2,35 +2,33 @@ class Pawn < Piece
 
   def valid_move?(dest_x, dest_y)
     return false unless super
-    # Allow one place movement at a time
-    valid_fwd_move?(dest_x, dest_y)
+    return true if capture_move?(dest_x, dest_y)
+    return false unless valid_path?(dest_x, dest_y)
+    true
   end
 
-  def diagonal_move?(dest_x, dest_y)
-    (dest_x - self.location_x).abs == (dest_y - self.location_y).abs && (dest_x - self.location_x).abs == 1
+  def valid_path?(dest_x, dest_y)
+    return false unless dest_x == self.location_x # || diagonal_move
+    return false if backwards_move?(dest_y)
+    # check for one vertical movement regardless of color
+    return true if (dest_y - self.location_y).abs == 1
+    # checks whether pawn has not moved, it allows vertical move of 1 or 2 places
+    return true if !self.has_moved && [1,2].include?((dest_y - self.location_y).abs)
   end
 
-  def valid_fwd_move?(dest_x, dest_y)
-    return false unless dest_x == self.location_x || capture_valid?(dest_x, dest_y)
-    if has_moved? && self.white
-      (dest_y - self.location_y) == 1
-    elsif has_moved? && !self.white
-      (dest_y - self.location_y) == -1
-    elsif !has_moved? && self.white
-      [1,2].include?(dest_y - self.location_y)
-    else
-      [-1,-2].include?(dest_y - self.location_y)
-    end
+  def capture_move?(dest_x, dest_y)
+    # Check if the pawn is obstructed by another piece
+    captured_piece = game.obstruction(dest_x, dest_y)
+    return false if captured_piece.blank?
+    return false unless captured_piece.white != self.white
+    # Tests for diagonal move
+    return false unless (dest_y - self.location_y).abs == 1 && (dest_x - self.location_x).abs == 1
+    true
   end
 
-  def capture_valid?(dest_x, dest_y)
-    captured_piece = game.occupied?(dest_x, dest_y)
-    return false if captured_piece.nil? || !is_opponent?(captured_piece)
-    diagonal_move?(dest_x, dest_y)
-  end
-
-  def has_moved?
-    white ? location_y == 1 : location_y == 6
+  private
+  def backwards_move?(dest_y)
+   self.white ? location_y > dest_y : location_y < dest_y
   end
 
 end

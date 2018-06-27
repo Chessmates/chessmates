@@ -29,10 +29,6 @@ class Piece < ApplicationRecord
     end
   end
 
-  def is_opponent?(piece)
-    piece.white # == white
-  end
-
 
   def destination_on_board?(x,y)
     [x,y].all? { |e| (e >= 0) && (e <= 7) }
@@ -143,12 +139,13 @@ class Piece < ApplicationRecord
     puts "This method needs to be defined in the piece's Unique Class;\ne.g. for the Queen piece, edit the Queen Class in queen.rb"
   end
 
-  def can_be_captured(piece)
+  def can_be_captured?(piece)
     friendlies = pieces.active.where(white: !piece.white)
     friendlies.each do |friendly|
       if friendly.valid_move?(piece.location_x, piece.location_y)
         return piece
       end
+    end
   end
 
   def can_be_blocked?(king)

@@ -25,32 +25,41 @@ class Game < ApplicationRecord
   end
 
   def occupied?(dest_x,dest_y)
-    pieces.active.where(location_x: dest_x, location_y: dest_y).any?
+    if piece = pieces.active.where(location_x: dest_x, location_y: dest_y).any?
+      piece
+      return true
+    else
+      false
+    end
+
   end
 
-  def check(king)
-   opponents = pieces.active.where(white: !king.white)
-   opponents.inject([]) do |result, piece|
-     if piece.valid_move?(king.location_x, king.location_y)
-       result << piece
-     end
-     result
-   end
+  def obstruction(dest_x, dest_y)
+    # Searches for active pieces in destination
+    # returns a piece object
+    pieces.find_by(location_x: dest_x, location_y: dest_y)
+  end
+
+  def check?(is_white)
+    king = pieces.find_by(type:'King', white: is_white)
+    opponents = pieces.includes(:game).active.where(white: !is_white)
+    opponents.each do |piece|
+      if piece.valid_move?(king.location_x, king.location_y)
+        @threatning_piece = piece
+        true
+      end
+    end
+    false
+  end
+
+ def checkmate?(is_white)
+  checked_king = pieces.find_by(type:'King', white:is_white)
+  return false unless check?(is_white)
+  return false if @threatning_piece.can_be_captured?
+  return false if @checked_king.can_escape_check?
+  return false if @threatning_piece.can_be_blocked?(checked_king)
+  true
  end
-
- def checkmate?(white)
-   king = King.where(white: is_white)
-   #return false if threatening_piece = check(king)
-   threatening_pieces = check(king)
-   return false if threatening_pieces.empty?
-   return false if threatening_pieces.all?{ |piece| piece.can_be_captured? }
-   # return false if checked king can move out of the check
-   return false if return false if threatening_pieces.all?{ |piece| piece.can_be_blocked?(king) }
-   true
- end
-
-
-
 
   def populate_game!
     piece_type = [Rook, Knight, Bishop, King, Queen, Bishop, Knight, Rook]
