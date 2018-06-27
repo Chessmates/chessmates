@@ -4,7 +4,7 @@ class Piece < ApplicationRecord
   scope :active, -> { where(notcaptured: true) }
 
   def valid_move?(x,y)
-    return false if self.game.forfeited?
+    return false if self.game.forfeited? || !self.opponent_piece?(x,y)
     destination_on_board?(x,y)
   end
 
@@ -20,18 +20,18 @@ class Piece < ApplicationRecord
     if self.valid_move?(new_x, new_y)
       if piece_at_x_y
         if opponent_piece?(new_x, new_y)
-          piece_at_x_y.update_attributes!(notcaptured: false, location_x: nil, location_y: nil)
-          self.update_attributes!(location_x: new_x, location_y: new_y, has_moved: true)
+          piece_at_x_y.update_attributes(notcaptured: false, location_x: nil, location_y: nil)
+          self.update_attributes(location_x: new_x, location_y: new_y, has_moved: true)
         end
       else
-        self.update_attributes!(location_x: new_x, location_y: new_y, has_moved: true)
+        self.update_attributes(location_x: new_x, location_y: new_y, has_moved: true)
       end
     end
   end
 
 
   def destination_on_board?(x,y)
-    [x,y].all? { |e| (e >= 0) && (e <= 7) }
+    [x,y].all? { |e| (e.to_i >= 0) && (e.to_i <= 7) }
   end
 
   def is_obstructed?(x,y)

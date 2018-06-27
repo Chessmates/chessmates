@@ -30,5 +30,4 @@ class Pawn < Piece
   def backwards_move?(dest_y)
    self.white ? location_y > dest_y : location_y < dest_y
   end
-
 end

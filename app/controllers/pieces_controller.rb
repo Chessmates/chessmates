@@ -4,17 +4,6 @@ class PiecesController < ApplicationController
   def create
   end
 
-  def show
-    @piece = Piece.find_by_id(params[:id])
-    return render_not_found if @piece.blank?
-
-    if @piece.white
-      return render_not_found(:forbidden) if current_user != @piece.game.white_player
-    else
-      return render_not_found(:forbidden) if current_user != @piece.game.black_player
-    end
-  end
-
   def update
     piece = Piece.find_by_id(params[:id])
     return render_not_found if piece.blank?
@@ -25,7 +14,14 @@ class PiecesController < ApplicationController
       return render_not_found(:forbidden) if current_user != piece.game.black_player
     end
 
-    piece.update_attributes(piece_params)
+    dest_x = params[:piece][:location_x].to_i
+    dest_y = params[:piece][:location_y].to_i
+
+    logger.debug "Valid Move? #{piece.valid_move?(dest_x,dest_y)}"
+
+    return render_not_found(:forbidden) if !piece.valid_move?(dest_x,dest_y)
+
+    piece.move_to!(dest_x,dest_y)
   end
 
   def castle
@@ -44,6 +40,6 @@ class PiecesController < ApplicationController
   private
 
   def piece_params
-    params.require(:piece).permit(:game_id, :location_x, :location_y, :has_moved)
+    params.require(:piece).permit(:game_id, :location_x, :location_y, :has_moved, :notcaptured)
   end
 end

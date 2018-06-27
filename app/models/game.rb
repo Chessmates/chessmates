@@ -79,7 +79,9 @@ class Game < ApplicationRecord
     return @pieces_by_col_then_row if @pieces_by_col_then_row
     @pieces_by_col_then_row = (0..7).map { Array.new(8) }
     pieces.each do |piece|
-      @pieces_by_col_then_row[piece.location_y][piece.location_x] = piece
+      if piece.location_x && piece.location_y
+        @pieces_by_col_then_row[piece.location_y][piece.location_x] = piece
+      end
     end
     @pieces_by_col_then_row
   end
