@@ -48,7 +48,7 @@
         <% end %>
       <% else %>
         <% if ((row % 2 == 0) && (col % 2 == 0)) || ((row % 2 != 0) && (col % 2 != 0)) %>
-          <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable" id="piece_<%= @piece.id %>" data-piece="<%= @piece.id %>" data-type="<%= @piece.type %>" data-white="<%= @piece.white %>" data-moved="<%= @piece.has_moved %>" data-notcaptured="<%= @piece.notcaptured %>"><%= @piece.picture.html_safe %></span></div>
+          <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable whitered" id="piece_<%= @piece.id %>" data-piece="<%= @piece.id %>" data-type="<%= @piece.type %>" data-white="<%= @piece.white %>" data-moved="<%= @piece.has_moved %>" data-notcaptured="<%= @piece.notcaptured %>"><%= @piece.picture.html_safe %></span></div>
         <% else %>
           <div class="black droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable" id="piece_<%= @piece.id %>" data-piece="<%= @piece.id %>" data-type="<%= @piece.type %>" data-white="<%= @piece.white %>" data-moved="<%= @piece.has_moved %>" data-notcaptured="<%= @piece.notcaptured %>"><%= @piece.picture.html_safe %></span></div>
         <% end %>
@@ -62,17 +62,17 @@
 
 
 <% if current_user == @game.white_player && white_king %>
-  <% if white_king.can_castle?(0,0,false) %>
+  <% if white_king.can_castle?(0,0) %>
     <%= link_to 'Kingside Castle - White Player', castle_game_piece_path(@game, white_king.id, rook_x: 0, rook_y: 0, has_moved: true), method: :patch, class: 'btn btn-info ks-white' %>
   <% end %>
-  <% if white_king.can_castle?(7,0,false) %>
+  <% if white_king.can_castle?(7,0) %>
     <%= link_to 'Queenside Castle - White Player', castle_game_piece_path(@game, white_king.id, rook_x: 7, rook_y: 0, has_moved: true), method: :patch, class: 'btn btn-info qs-white' %>
   <% end %>
 <% elsif current_user == @game.black_player && black_king %>
-  <% if black_king.can_castle?(0,7,false) %>
+  <% if black_king.can_castle?(0,7) %>
     <%= link_to 'Kingside Castle - Black Player', castle_game_piece_path(@game, black_king.id, rook_x: 0, rook_y: 7, has_moved: true), method: :patch, class: 'btn btn-info ks-black' %>
   <% end %>
-  <% if black_king.can_castle?(7,7,false) %>
+  <% if black_king.can_castle?(7,7) %>
     <%= link_to 'Queenside Castle - Black Player', castle_game_piece_path(@game, black_king.id, rook_x: 7, rook_y: 7, has_moved: true), method: :patch, class: 'btn btn-info qs-black' %>
   <% end %>
 <% end %>

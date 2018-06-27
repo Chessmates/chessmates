@@ -19,7 +19,7 @@ class PiecesController < ApplicationController
 
     return render_not_found(:forbidden) if !piece.valid_move?(dest_x,dest_y)
 
-    piece.update_attributes(piece_params)
+    piece.move_to!(dest_x,dest_y)
   end
 
   def castle
@@ -38,6 +38,6 @@ class PiecesController < ApplicationController
   private
 
   def piece_params
-    params.require(:piece).permit(:game_id, :location_x, :location_y, :has_moved)
+    params.require(:piece).permit(:game_id, :location_x, :location_y, :has_moved, :notcaptured)
   end
 end
