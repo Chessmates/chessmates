@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Knight, type: :model do
-  
+
   it "disallows any moves that are not L-Shaped (1 by 2 places)" do
     game = FactoryBot.create(:game)
     knight = Knight.create(location_x: 6, location_y: 3, game_id: game.id)
@@ -64,7 +64,7 @@ RSpec.describe Knight, type: :model do
     game = FactoryBot.create(:game)
     knight = Knight.create(game_id: game.id, location_x: 2, location_y: 5, white: true)
     pawn = Pawn.create(game_id: game.id, location_x: 3, location_y: 3, white: true, notcaptured: true)
-    
+
     knight.move_to!(3,3)
     pawn.reload
     knight.reload
