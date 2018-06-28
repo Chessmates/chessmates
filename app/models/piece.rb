@@ -139,16 +139,19 @@ class Piece < ApplicationRecord
     puts "This method needs to be defined in the piece's Unique Class;\ne.g. for the Queen piece, edit the Queen Class in queen.rb"
   end
 
-  def can_be_captured?(piece)
-    friendlies = pieces.active.where(white: !piece.white)
-    friendlies.each do |friendly|
-      if friendly.valid_move?(piece.location_x, piece.location_y)
-        return piece
+  def can_be_captured?
+    opponents = pieces.active.where(white: !self.white)
+    opponents.each do |opponent|
+      if opponent.valid_move?(self.location_x, self.location_y)
+        return true
+      else
+        return false
       end
     end
   end
 
   def can_be_blocked?(king)
+    return false if self.type = "Knight" #Knights can't be blocked
     obstruct_locations = []
     range = (-1..1)
     range.each do |i|
@@ -158,13 +161,13 @@ class Piece < ApplicationRecord
       end
     end
 
-    friendlies = pieces.active.where(white: !piece.white)
+    friendlies = pieces.active.where(white: king.white)
     obstruct_locations.each do |location|
       friendlies.each do |friendly|
         if friendly.valid_move?(location[0], location[1])
-          true
+          return true
         else
-          false
+          return false
         end
       end
     end
