@@ -1,82 +1,43 @@
-
-.form-signin {
-  max-width: 330px;
-  margin: 0 auto;
-}
-
-.containr {
-  width: 720px;
-  max-width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
-  padding-top: 60px;
-  padding-bottom: 40px;
-  position: relative;
+.reg-box {
+  max-width: 34em;
   margin-left: auto;
   margin-right: auto;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #292b2c;
-}
-
-.form-signin .form-signin-heading, .form-signin .checkbox {
-  margin-bottom: 10px;
-
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0,0,0,0);
-  border: 0;
-}
-
-.registration {
-  
-  background-color: #eee;
-}
-
-label {
-    display: inline-block;
-}
-
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.form-signin .form-control {
-  position: relative;
-  height: auto;
+  margin-top: 6em;
   box-sizing: border-box;
+  padding: 4em 2em;
+  background-color: #dddddd;
+  border-radius: 3px;
+  border: 1px solid #999999;
+  text-align: center;
+  line-height: 1.5;
+  font-family: 'Roboto', sans-serif; 
+
+}
+
+.reg-box h2 {
+  font-size: 4em;
+  padding-bottom: 15px;
+  font-weight: 900;
+}
+ 
+.field {
   padding: 10px;
-  font-size: 16px;
+  font-weight: 400;
 }
 
-.form-control {
-    display: block;
-    width: 100%;
-    line-height: 1.25;
-    color: #464a4c;
-    background-color: #fff;
-    background-image: none;
-    background-clip: padding-box;
-    border: 1px solid rgba(0,0,0,.15);
-    border-radius: .25rem;
+#user_email {
+  width: 100%;
 }
 
+#user_password {
+  width: 100%;
+}
 
+#user_username {
+  width: 100%;
+}
 
-
+#user_password_confirmation {
+  width: 100%;
+}
 
