@@ -1,0 +1,43 @@
+.reg-box {
+  max-width: 34em;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 6em;
+  box-sizing: border-box;
+  padding: 4em 2em;
+  background-color: #dddddd;
+  border-radius: 3px;
+  border: 1px solid #999999;
+  text-align: center;
+  line-height: 1.5;
+  font-family: 'Roboto', sans-serif; 
+
+}
+
+.reg-box h2 {
+  font-size: 4em;
+  padding-bottom: 15px;
+  font-weight: 900;
+}
+ 
+.field {
+  padding: 10px;
+  font-weight: 400;
+}
+
+#user_email {
+  width: 100%;
+}
+
+#user_password {
+  width: 100%;
+}
+
+#user_username {
+  width: 100%;
+}
+
+#user_password_confirmation {
+  width: 100%;
+}
+

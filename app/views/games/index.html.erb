@@ -1,11 +1,20 @@
+<div class ="games-list">
+  <h3>Available Games</h3>
 
-<h3>List of Available Chess games</h3>
+  <div class="card-deck">
+    <% @games.reverse.each do |game| %>
+      <div class="card">
+        <%= image_tag("chess.jpg", class: "card-img-top") %>
+        <div class="card-body">
+         <h4><%= game.game_name %></h4><br />
+         <h5 class ="game-creator">Created By: <%= game.white_player.username %></h5>
+         <br/>
+          <%= link_to 'Join Game', game_path(game), class: 'btn btn-success' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
 
+    
 
-<% @games.reverse.each do |game| %>
-    <h4><%= game.game_name %></h4><br />
-    <h5>Created By: <%= game.white_player.username %></h5>
-    <%= link_to 'Game Details', game_path(game), class: 'btn btn-success' %>
-<% end %>
-
-     

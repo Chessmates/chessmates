@@ -24,3 +24,28 @@
     display: table-cell;
     vertical-align:middle;
 }
+
+h3 {
+    text-align: center;
+}
+
+.games-list h3 {
+    padding-top: 80px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    font-size: 100px;
+}
+
+.card-deck {
+    padding-right: 50px;
+    padding-left: 50px;
+    padding-top: 50px;
+}
+
+.card-body {
+    text-align: center;
+}
+
+.game-creator {
+    font-size: 18px;
+}
