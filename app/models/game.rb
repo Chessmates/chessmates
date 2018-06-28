@@ -40,25 +40,45 @@ class Game < ApplicationRecord
     pieces.find_by(location_x: dest_x, location_y: dest_y)
   end
 
+  def threatning_piece(king)
+    # It searches for the threatning_pieces and returns a piece object
+     opponents = pieces.active.where(white: !king.white)
+     opponents.each do |piece|
+       if piece.valid_move?(king.location_x, king.location_y)
+         return piece
+       end
+     end
+  end
+
   def check?(is_white)
-    king = pieces.find_by(type:'King', white: is_white)
-    opponents = pieces.includes(:game).active.where(white: !is_white)
-    opponents.each do |piece|
-      if piece.valid_move?(king.location_x, king.location_y)
-        @threatning_piece = piece
-        true
-      end
-    end
-    false
+      # Returns a boolean that indicates whether the current state of the game is check.
+    king = defending_king(is_white)
+    threatning_piece(king).present?
+  end
+  # def check?(is_white)
+  #
+  #   opponents = pieces.includes(:game).active.where(white: !is_white)
+  #   opponents.each do |piece|
+  #     if piece.valid_move?(king.location_x, king.location_y)
+  #       @threatning_piece = piece
+  #       true
+  #     end
+  #   end
+  #   false
+  # end
+  def defending_king(is_white)
+    # searches for King by color
+    # helper method for both check and checkmate
+    pieces.find_by(type:'King', white:is_white)
   end
 
  def checkmate?(is_white)
-  checked_king = pieces.find_by(type:'King', white:is_white)
   return false unless check?(is_white)
-  return false if @threatning_piece.can_be_captured?
-  return false if @checked_king.can_escape_check?
-  return false if @threatning_piece.can_be_blocked?(checked_king)
-  true
+  checked_king = defending_king(is_white)
+  threat = threatning_piece(checked_king)
+  threat_can_be_handled = (threat.can_be_captured? || threat.can_be_blocked?(checked_king))
+  # returns true if threat cannot be handled and king can't escape check
+  (threat_can_be_handled || checked_king.can_escape_check?(threat)) ? false : true
  end
 
   def populate_game!
