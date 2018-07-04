@@ -78,7 +78,7 @@ class Game < ApplicationRecord
   threat = threatning_piece(checked_king)
   threat_can_be_handled = (threat.can_be_captured? || threat.can_be_blocked?(checked_king))
   # returns true if threat cannot be handled and king can't escape check
-  (threat_can_be_handled || checked_king.can_escape_check?(threat)) ? false : true
+  (threat_can_be_handled || checked_king.can_escape_check?) ? false : true
  end
 
   def populate_game!
