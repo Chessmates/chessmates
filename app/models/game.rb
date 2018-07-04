@@ -55,7 +55,7 @@ class Game < ApplicationRecord
     king = defending_king(is_white)
     threatning_piece(king).present?
   end
-  
+
   def defending_king(is_white)
     # searches for King by color
     # helper method for both check and checkmate

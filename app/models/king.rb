@@ -36,15 +36,6 @@ class King < Piece
     end
 end
 
-  def can_castle?(rook_x, rook_y)
-    rook = game.pieces.find_by(location_x: rook_x, location_y: rook_y)
-    return false if rook.nil?
-    return false if self.has_moved? || rook.has_moved?
-    # return false if game.check?(self.white)
-    return false if self.h_obs?(rook_x, rook_y)
-    return true
-  end
-
 
   def castle!(rook_x, rook_y, has_moved)
     rook = game.pieces.find_by(location_x: rook_x, location_y: rook_y)
