@@ -55,17 +55,7 @@ class Game < ApplicationRecord
     king = defending_king(is_white)
     threatning_piece(king).present?
   end
-  # def check?(is_white)
-  #
-  #   opponents = pieces.includes(:game).active.where(white: !is_white)
-  #   opponents.each do |piece|
-  #     if piece.valid_move?(king.location_x, king.location_y)
-  #       @threatning_piece = piece
-  #       true
-  #     end
-  #   end
-  #   false
-  # end
+  
   def defending_king(is_white)
     # searches for King by color
     # helper method for both check and checkmate
