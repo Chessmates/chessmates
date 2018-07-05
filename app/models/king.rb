@@ -13,26 +13,28 @@ class King < Piece
   end
 
   def can_escape_check?
+  # It should check at all possible locations the king could move
+  # It should check if at the possible locations, the king can escape check by moving to valid loc
+    threats = game.pieces.active.where(white: !self.white)
+    escape_locations = []
     range = (-1..1)
-    range.each do |x|
-      range.each do |y|
-        if valid_move(x, y) && threatening_pieces.valid_move?
-           return true
-        else
+    range.each do |i|
+      range.each do |j|
+        next if [i,j] == [0,0]
+        escape_locations << [self.location_x + i,self.location_y + j]
+      end
+    end
+
+    threats.each do |threat|
+      escape_locations.each do |x, y|
+        if threat.valid_move?(x,y)
           return false
+        else
+          return true
         end
       end
     end
-  end
-
-  def can_castle?(rook_x, rook_y)
-    rook = game.pieces.find_by(location_x: rook_x, location_y: rook_y)
-    return false if rook.nil?
-    return false if self.has_moved? || rook.has_moved?
-    # return false if game.check?(self.white)
-    return false if self.h_obs?(rook_x, rook_y)
-    return true
-  end
+end
 
 
   def castle!(rook_x, rook_y, has_moved)
