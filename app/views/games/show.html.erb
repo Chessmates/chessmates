@@ -1,5 +1,5 @@
 <!-- Display "JOIN" button if Game has no Black Player -->
-<h3><%= @game.game_name %></h3>
+<h3 class="game-name"><%= @game.game_name %></h3>
 <% if @game.black_player.nil?  %>
 <%= link_to 'Join Game', game_path(@game), method: :patch, class: 'btn btn-primary' %>
 <% end %>
