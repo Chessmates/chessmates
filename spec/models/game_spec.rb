@@ -42,6 +42,36 @@ RSpec.describe Game, type: :model do
 
     expect(game.forfeitable?).to be true
   end
+
+  it "determines if a game is in check or not" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    king = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true)
+    wqueen = Queen.create(game_id: game.id, location_x: 2, location_y: 1, white: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false)
+
+    expect(game.check?(true)).to be true
+
+    wqueen.move_to!(3,1)
+    wqueen.reload
+
+    expect(game.check?(true)).to be false
+  end
+
+  it "determines if a game is in checkmate" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    king = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    wpawn1 = Pawn.create(game_id: game.id, location_x: 2, location_y: 1, white: true, notcaptured: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
+    wpawn2 = Pawn.create(game_id: game.id, location_x: 2, location_y: 0, white: true, notcaptured: true)
+    wpawn3 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
+    wpawn4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
+
+    expect(game.checkmate?(true)).to be true
+  end
   
 
 end

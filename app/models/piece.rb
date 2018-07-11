@@ -4,7 +4,7 @@ class Piece < ApplicationRecord
   scope :active, -> { where(notcaptured: true) }
 
   def valid_move?(x,y)
-    return false if self.game.forfeited? || !self.opponent_piece?(x,y)
+    return false if self.game.forfeited? || !self.opponent_piece?(x,y) # OR King is in check after move
     destination_on_board?(x,y)
   end
 
@@ -133,14 +133,8 @@ class Piece < ApplicationRecord
     return false
   end
 
-
-  # Each Piece Type must Implement this logic in their Class
-  def valid_path?(x,y)
-    puts "This method needs to be defined in the piece's Unique Class;\ne.g. for the Queen piece, edit the Queen Class in queen.rb"
-  end
-
   def can_be_captured?
-    opponents = pieces.active.where(white: !self.white)
+    opponents = game.pieces.where(white: !self.white, notcaptured: true)
     opponents.each do |opponent|
       if opponent.valid_move?(self.location_x, self.location_y)
         return true
@@ -161,7 +155,7 @@ class Piece < ApplicationRecord
       end
     end
 
-    friendlies = pieces.active.where(white: king.white)
+    friendlies = pieces.where(white: king.white, notcaptured: true)
     obstruct_locations.each do |location|
       friendlies.each do |friendly|
         if friendly.valid_move?(location[0], location[1])
@@ -172,21 +166,4 @@ class Piece < ApplicationRecord
       end
     end
   end
-
-
-  def move_to!(new_x,new_y)
-    dest = game.pieces.find_by(location_x: new_x, location_y: new_y)
-
-    if !self.valid_move?(new_x, new_y)
-      return "Can't Move There"
-    elsif dest.nil?
-      self.update_attributes(location_x: new_x, location_y: new_y, has_moved: true)
-    elsif dest.white != self.white # Checking if destination has an enemy_piece. Maybe pull into own method.
-      dest.update_attributes(notcaptured: false, location_x: nil, location_y: nil)
-      self.update_attributes(location_x: new_x, location_y: new_y, has_moved: true)
-    else
-      return "ERROR! Cannot move there; occupied by your team's piece"
-    end
-  end
-
 end
