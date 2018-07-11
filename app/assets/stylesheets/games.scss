@@ -1,9 +1,14 @@
 .chessboard {
     width: 642px;
     height: 642px;
-    margin: 20px;
+    margin: 70px;
     border: 1px solid #111;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);  
 }
+
 .black {
     float: left;
     width: 80px;
@@ -14,6 +19,7 @@
     display: table-cell;
     vertical-align:middle;
 }
+
 .white {
     float: left;
     width: 80px;
@@ -25,27 +31,10 @@
     vertical-align:middle;
 }
 
-h3 {
+.game-name {
+    font-size: 4em;
+    padding-top: 20px;
+    padding-bottom: 15px;
+    font-weight: 900;
     text-align: center;
-}
-
-.games-list h3 {
-    padding-top: 80px;
-    font-family: 'Heebo', sans-serif;
-    font-weight: 700;
-    font-size: 100px;
-}
-
-.card-deck {
-    padding-right: 50px;
-    padding-left: 50px;
-    padding-top: 50px;
-}
-
-.card-body {
-    text-align: center;
-}
-
-.game-creator {
-    font-size: 18px;
 }

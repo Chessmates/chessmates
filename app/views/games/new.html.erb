@@ -1,4 +1,7 @@
-<%= simple_form_for @game do |f| %>
-  <%= f.input :game_name %>
-  <%= f.submit 'Create Game', class: 'btn btn-primary' %>
-<% end %>
+<div class="reg-box"> 
+  <h2> Create Game </h2>
+  <%= simple_form_for @game do |f| %>
+    <%= f.input :game_name %>
+    <%= f.submit 'Submit', class: 'btn btn-primary' %>
+  <% end %>
+</div>
