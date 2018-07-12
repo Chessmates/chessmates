@@ -8,6 +8,14 @@ class Piece < ApplicationRecord
     destination_on_board?(x,y)
   end
 
+  def occupied?(x,y)
+    if game.pieces.find_by(location_x: x, location_y: y)
+      return true
+    else
+      return false
+    end
+  end
+
   def opponent_piece?(x,y)
     piece_at_x_y = game.pieces.find_by(location_x: x, location_y: y)
     return false if piece_at_x_y && (self.white == piece_at_x_y.white)
@@ -135,35 +143,129 @@ class Piece < ApplicationRecord
 
   def can_be_captured?
     opponents = game.pieces.where(white: !self.white, notcaptured: true)
+    answer = false
     opponents.each do |opponent|
       if opponent.valid_move?(self.location_x, self.location_y)
-        return true
-      else
-        return false
+        answer = true
       end
     end
+    return answer
   end
 
-  def can_be_blocked?(king)
-    return false if self.type = "Knight" #Knights can't be blocked
-    obstruct_locations = []
-    range = (-1..1)
-    range.each do |i|
-      range.each do |j|
-        next if [i,j] == [0,0]
-        obstruct_locations << [king.location_x+i,king.location_y+j]
-      end
+  def can_be_blocked?(king,obstruct_locations=[])
+    return false if self.type == "Knight" # Knights can't be blocked
+    return false if (self.location_x - king.location_x).abs == 1 || (self.location_y - king.location_y).abs == 1
+
+    if self.vertical_path_to(king)
+      self.vertical_places(king,obstruct_locations)
+    elsif self.horizontal_path_to(king)
+      self.horizontal_places(king,obstruct_locations)
+    elsif self.diagonal_path_to(king)
+      self.diagonal_places(king,obstruct_locations)
     end
 
-    friendlies = pieces.where(white: king.white, notcaptured: true)
-    obstruct_locations.each do |location|
+    friendlies = game.pieces.where(white: king.white, notcaptured: true).where.not(type: "King")
+    answer = false
+    obstruct_locations.each do |x,y|
       friendlies.each do |friendly|
-        if friendly.valid_move?(location[0], location[1])
-          return true
-        else
-          return false
+        if friendly.valid_move?(x,y)
+          answer = true
         end
       end
     end
+    return answer
+  end
+
+  def vertical_path_to(king)
+    if (self.location_x == king.location_x) && ((self.location_y - king.location_y).abs > 1)
+      return true
+    else
+      return false
+    end
+  end
+
+  def vertical_places(king,obstruct_locations=[])
+    if self.location_y < king.location_y
+      mini = self.location_y
+      maxi = king.location_y
+    else
+      mini = king.location_y
+      maxi = self.location_y
+    end
+
+    range = (mini+1..maxi-1)
+    # obstruct_locations = []
+
+    range.each do |i|
+      obstruct_locations << [self.location_x, i]
+    end
+    return obstruct_locations
+  end
+
+  def horizontal_path_to(king)
+    if (self.location_y == king.location_y) && ((self.location_x - king.location_x).abs > 1)
+      return true
+    else
+      return false
+    end
+  end
+
+  def horizontal_places(king,obstruct_locations=[])
+    if self.location_x < king.location_x
+      mini = self.location_x
+      maxi = king.location_x
+    else
+      mini = king.location_x
+      maxi = self.location_x
+    end 
+
+    range = (mini+1..maxi-1)
+    # obstruct_locations = []
+
+    range.each do |i|
+      obstruct_locations << [i, self.location_y]
+    end
+    return obstruct_locations
+  end
+
+  def diagonal_path_to(king)
+    if ((self.location_x - king.location_x).abs == (self.location_y - king.location_y).abs) && ((self.location_x - king.location_x).abs > 1)
+      return true
+    else
+      return false
+    end
+  end
+
+  def diagonal_places(king,obstruct_locations=[])
+    if (self.location_x > king.location_x) && (self.location_y < king.location_y)
+      # obstruct_locations = []
+      a = 1
+      while a < (self.location_x - king.location_x).abs
+        obstruct_locations << [king.location_x + a, king.location_y - a]
+        a = a + 1
+      end
+    elsif (self.location_x > king.location_x) && (self.location_y > king.location_y)
+      # obstruct_locations = []
+      a = 1
+      while a < (self.location_x - king.location_x).abs
+        obstruct_locations << [king.location_x + a, king.location_y + a]
+        a = a + 1
+      end
+    elsif (self.location_x < king.location_x) && (self.location_y > king.location_y)
+      # obstruct_locations = []
+      a = 1
+      while a < (self.location_x - king.location_x).abs
+        obstruct_locations << [king.location_x - a, king.location_y + a]
+        a = a + 1
+      end
+    elsif (self.location_x < king.location_x) && (self.location_y < king.location_y)
+      # obstruct_locations = []
+      a = 1
+      while a < (self.location_x - king.location_x).abs
+        obstruct_locations << [king.location_x - a, king.location_y - a]
+        a = a + 1
+      end
+    end
+    return obstruct_locations
   end
 end

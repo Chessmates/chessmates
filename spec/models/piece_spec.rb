@@ -154,4 +154,67 @@ RSpec.describe Piece, type: :model do
     expect(piece).to receive(:move_to!).with(3,4).and_return(:valid_move?)
     piece.move_to!(3,4)
   end
+
+  it "determines if a threatening piece can be captured" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    wking = King.create(game_id: game.id, location_x: 0, location_y: 0, white: true, notcaptured: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
+    wpawn1 = Pawn.create(game_id: game.id, location_x: 1, location_y: 0, white: true, notcaptured: true)
+    wpawn2 = Pawn.create(game_id: game.id, location_x: 0, location_y: 1, white: true, notcaptured: true)
+    wRook = Rook.create(game_id: game.id, location_x: 3, location_y: 2, white: true, notcaptured: true)
+
+    expect(bqueen.can_be_captured?).to be true
+  end
+
+  it "determines if a threatening piece cannot be captured" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    wking = King.create(game_id: game.id, location_x: 0, location_y: 0, white: true, notcaptured: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
+    wpawn1 = Pawn.create(game_id: game.id, location_x: 1, location_y: 0, white: true, notcaptured: true)
+    wpawn2 = Pawn.create(game_id: game.id, location_x: 0, location_y: 1, white: true, notcaptured: true)
+    wKnight = Knight.create(game_id: game.id, location_x: 3, location_y: 2, white: true, notcaptured: true)
+
+    expect(bqueen.can_be_captured?).to be false
+  end
+
+  it "determines if a threatening piece can be blocked" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    wKi = King.create(game_id: game.id, location_x: 3, location_y: 3, white: true, notcaptured: true)
+    wR1 = Rook.create(game_id: game.id, location_x: 4, location_y: 5, white: true, notcaptured: true)
+    wR2 = Rook.create(game_id: game.id, location_x: 1, location_y: 1, white: true, notcaptured: true)
+    bQ2 = Queen.create(game_id: game.id, location_x: 6, location_y: 6, white: false, notcaptured: true)
+    bQ3 = Queen.create(game_id: game.id, location_x: 3, location_y: 7, white: false, notcaptured: true)
+    bB1 = Bishop.create(game_id: game.id, location_x: 0, location_y: 6, white: false, notcaptured: true)
+    bR1 = Rook.create(game_id: game.id, location_x: 0, location_y: 3, white: false, notcaptured: true)
+    bR2 = Rook.create(game_id: game.id, location_x: 3, location_y: 0, white: false, notcaptured: true)
+
+    expect(bQ2.can_be_blocked?(wKi)).to be true
+    expect(bQ3.can_be_blocked?(wKi)).to be true
+    expect(bB1.can_be_blocked?(wKi)).to be true
+    expect(bR1.can_be_blocked?(wKi)).to be true
+    expect(bR2.can_be_blocked?(wKi)).to be true
+  end
+
+  it "determines if a threatening piece cannot be blocked" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    wKi = King.create(game_id: game.id, location_x: 3, location_y: 3, white: true, notcaptured: true)
+    bQ1 = Queen.create(game_id: game.id, location_x: 4, location_y: 3, white: false, notcaptured: true)
+    bQ2 = Queen.create(game_id: game.id, location_x: 6, location_y: 6, white: false, notcaptured: true)
+    wB = Bishop.create(game_id: game.id, location_x: 4, location_y: 5, white: true, notcaptured: true)
+    bP = Pawn.create(game_id: game.id, location_x: 4, location_y: 2, white: false, notcaptured: true)
+    bB = Bishop.create(game_id: game.id, location_x: 2, location_y: 2, white: false, notcaptured: true)
+
+    expect(bQ2.can_be_blocked?(wKi)).to be false
+    expect(bQ1.can_be_blocked?(wKi)).to be false
+    expect(bP.can_be_blocked?(wKi)).to be false
+    expect(bB.can_be_blocked?(wKi)).to be false
+  end
 end

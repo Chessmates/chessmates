@@ -43,7 +43,7 @@ class Game < ApplicationRecord
   def threatning_piece(king)
     # It searches for the threatning_pieces and returns a piece object
     # The presence of "active" in the former 'opponents' definition did not let the tests pass
-    opponents = self.pieces.where(white: !king.white, notcaptured: true)
+    opponents = self.pieces.where(notcaptured: true).where.not(white: king.white)
     opponents.each do |opponent|
       if opponent.valid_move?(king.location_x, king.location_y)
         return opponent

@@ -43,13 +43,37 @@ RSpec.describe Game, type: :model do
     expect(game.forfeitable?).to be true
   end
 
-  it "determines if a game is in check or not" do
+  it "identifies defending kings (white or black)" do
     game = FactoryBot.create(:game)
     game.pieces.destroy_all
 
-    king = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true)
-    wqueen = Queen.create(game_id: game.id, location_x: 2, location_y: 1, white: true)
-    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false)
+    wKing = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true)
+    bKing = King.create(game_id: game.id, location_x: 3, location_y: 7, white: false)
+
+    expect(game.defending_king(true).type).to eq "King"
+    expect(game.defending_king(true).location_y).to eq 0
+    expect(game.defending_king(false).type).to eq "King"
+    expect(game.defending_king(false).location_y).to eq 7
+  end
+
+  it "identifies a threatening piece" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    king = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    wqueen = Queen.create(game_id: game.id, location_x: 2, location_y: 1, white: true, notcaptured: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
+
+    expect(game.threatning_piece(king).present?).to be true
+  end
+
+  it "determines if the game is in check or not" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    king = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    wqueen = Queen.create(game_id: game.id, location_x: 2, location_y: 1, white: true, notcaptured: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
 
     expect(game.check?(true)).to be true
 
@@ -72,6 +96,4 @@ RSpec.describe Game, type: :model do
 
     expect(game.checkmate?(true)).to be true
   end
-  
-
 end
