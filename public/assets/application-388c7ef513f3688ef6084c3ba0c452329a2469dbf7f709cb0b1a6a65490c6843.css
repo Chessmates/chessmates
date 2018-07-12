@@ -190,7 +190,7 @@
  * http://jquery.org/license
  *
  * http://api.jqueryui.com/category/theming/
- */.footer a{color:white;font-weight:100px;font-size:15px}.footer{position:fixed;left:0;bottom:0;width:100%;background-color:#343a40;color:#ffffff;text-align:center;padding:0.5rem 1rem}.chessboard{width:642px;height:642px;margin:20px;border:1px solid #111}.black{float:left;width:80px;height:80px;background-color:#999;font-size:50px;text-align:center;display:table-cell;vertical-align:middle}.white{float:left;width:80px;height:80px;background-color:#fff;font-size:50px;text-align:center;display:table-cell;vertical-align:middle}h3{text-align:center}.games-list h3{padding-top:80px;font-family:'Heebo', sans-serif;font-weight:700;font-size:100px}.card-deck{padding-right:50px;padding-left:50px;padding-top:50px}.card-body{text-align:center}.game-creator{font-size:18px}/*!
+ */.footer a{color:white;font-weight:100px;font-size:15px}.footer{position:fixed;left:0;bottom:0;width:100%;background-color:#343a40;color:#ffffff;text-align:center;padding:0.5rem 1rem}.chessboard{width:642px;height:642px;margin:70px;border:1px solid #111;position:absolute;left:50%;top:50%;-webkit-transform:translate(-50%, -50%);transform:translate(-50%, -50%)}.black{float:left;width:80px;height:80px;background-color:#999;font-size:50px;text-align:center;display:table-cell;vertical-align:middle}.white{float:left;width:80px;height:80px;background-color:#fff;font-size:50px;text-align:center;display:table-cell;vertical-align:middle}.game-name{font-size:4em;padding-top:20px;padding-bottom:15px;font-weight:900;text-align:center}/*!
  * Bootstrap v4.1.1 (https://getbootstrap.com/)
  * Copyright 2011-2018 The Bootstrap Authors
  * Copyright 2011-2018 Twitter, Inc.
