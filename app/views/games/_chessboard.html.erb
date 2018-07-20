@@ -1,0 +1,20 @@
+<div class="chessboard">
+  <% (0..7).each do |col| %>
+    <% (0..7).each do |row| %>
+      <% @piece = @game.pieces_by_col_then_row[col][row] %>
+      <% if @piece.nil? %>
+        <% if ((row % 2 == 0) && (col % 2 == 0)) || ((row % 2 != 0) && (col % 2 != 0)) %>
+          <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"></div>
+        <% else %>
+          <div class="black droppable" data-x="<%= row %>" data-y="<%= col %>"></div>
+        <% end %>
+      <% else %>
+        <% if ((row % 2 == 0) && (col % 2 == 0)) || ((row % 2 != 0) && (col % 2 != 0)) %>
+          <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable whitered" id="piece_<%= @piece.id %>" data-piece="<%= @piece.id %>" data-type="<%= @piece.type %>" data-white="<%= @piece.white %>" data-moved="<%= @piece.has_moved %>" data-notcaptured="<%= @piece.notcaptured %>"><%= @piece.picture.html_safe %></span></div>
+        <% else %>
+          <div class="black droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable" id="piece_<%= @piece.id %>" data-piece="<%= @piece.id %>" data-type="<%= @piece.type %>" data-white="<%= @piece.white %>" data-moved="<%= @piece.has_moved %>" data-notcaptured="<%= @piece.notcaptured %>"><%= @piece.picture.html_safe %></span></div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

@@ -43,11 +43,15 @@ class GamesController < ApplicationController
     return render_not_found if @game.blank?
 
     if @game.white_player != current_user
-      return render plain: 'Not Allowed!', status: :forbidden
+      flash[:alert] = "Only The Game Creator Can Delete This Game"
+      return render_not_found(:forbidden)
+    elsif @game.black_player
+      flash[:alert] = "The Game Has TWO Players; You Can Only Forfeit"
+      return render_not_found(:forbidden)
     end
 
     @game.destroy
-    redirect_to root_path
+    redirect_to games_path
   end
 
   def forfeit
@@ -67,6 +71,11 @@ class GamesController < ApplicationController
       flash[:alert] = "You cannot forfeit this game."
       redirect_to game_path(@game)
     end
+  end
+
+  def reload_board
+    @game = Game.find_by_id(params[:id])
+    render :partial => "chessboard", :locals => {:game => @game}
   end
 
   private

@@ -17,11 +17,28 @@ class PiecesController < ApplicationController
     dest_x = params[:piece][:location_x].to_i
     dest_y = params[:piece][:location_y].to_i
 
-    logger.debug "Valid Move? #{piece.valid_move?(dest_x,dest_y)}"
-
     return render_not_found(:forbidden) if !piece.valid_move?(dest_x,dest_y)
 
+    # Piece.transaction do
+    #   piece.update_attributes(location_x: dest_x, location_y: dest_y, has_moved: true)
+    #   if piece.game.check?(piece.white)
+    #     raise ActiveRecord::Rollback
+    #     # flash[:alert] = 'Your King Would Be Exposed!'
+    #     return render_not_found(:forbidden)
+    #   end
+    # end
+
     piece.move_to!(dest_x,dest_y)
+    
+    if piece.save
+      ActionCable.server.broadcast "locations",
+        game_id: piece.game.id
+        # piece_id: piece.id,
+        # x_location: piece.location_x,
+        # y_location: piece.location_y,
+        # has_moved: piece.has_moved
+      head :ok
+    end
   end
 
   def castle

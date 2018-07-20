@@ -31,7 +31,6 @@ class Game < ApplicationRecord
     else
       false
     end
-
   end
 
   def obstruction(dest_x, dest_y)
@@ -40,32 +39,37 @@ class Game < ApplicationRecord
     pieces.find_by(location_x: dest_x, location_y: dest_y)
   end
 
-  def threatning_piece(king)
+
+  def threatning_piece(defking)
     # It searches for the threatning_pieces and returns a piece object
-     opponents = pieces.active.where(white: !king.white)
-     opponents.each do |piece|
-       if piece.valid_move?(king.location_x, king.location_y)
-         return piece
-       end
-     end
+    # The presence of "active" in the former 'opponents' definition did not let the tests pass
+    opposite_color = ! defking.white
+    opponents = self.pieces.where(notcaptured: true, white: opposite_color)
+    opponents.each do |opponent|
+      if opponent.valid_move?(defking.location_x, defking.location_y)
+        return opponent
+      else
+        return nil
+      end
+    end
   end
 
   def check?(is_white)
       # Returns a boolean that indicates whether the current state of the game is check.
-    king = defending_king(is_white)
-    threatning_piece(king).present?
+    defking = defending_king(is_white)
+    self.threatning_piece(defking).present?
   end
 
   def defending_king(is_white)
     # searches for King by color
     # helper method for both check and checkmate
-    pieces.find_by(type:'King', white:is_white)
+    self.pieces.find_by(type:'King', white:is_white)
   end
 
  def checkmate?(is_white)
   return false unless check?(is_white)
   checked_king = defending_king(is_white)
-  threat = threatning_piece(checked_king)
+  threat = self.threatning_piece(checked_king)
   threat_can_be_handled = (threat.can_be_captured? || threat.can_be_blocked?(checked_king))
   # returns true if threat cannot be handled and king can't escape check
   (threat_can_be_handled || checked_king.can_escape_check?) ? false : true

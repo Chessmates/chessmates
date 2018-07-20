@@ -144,4 +144,32 @@ RSpec.describe King, type: :model do
     expect(game.pieces.find_by(location_x: 4, location_y: 7).white).to be false
   end
   # Castling Tests: END =============
+
+  it "determines if a checked king can escape check" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    wking = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
+    wpawn1 = Pawn.create(game_id: game.id, location_x: 1, location_y: 1, white: true, notcaptured: true)
+    wpawn2 = Pawn.create(game_id: game.id, location_x: 2, location_y: 0, white: true, notcaptured: true)
+    wpawn3 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
+    wpawn4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
+
+    expect(wking.can_escape_check?).to be true
+  end
+
+  it "determines if a checked king cannot escape check" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    wking = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
+    wpawn1 = Pawn.create(game_id: game.id, location_x: 2, location_y: 1, white: true, notcaptured: true)
+    wpawn2 = Pawn.create(game_id: game.id, location_x: 2, location_y: 0, white: true, notcaptured: true)
+    wpawn3 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
+    wpawn4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
+
+    expect(wking.can_escape_check?).to be false
+  end
 end

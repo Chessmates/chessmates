@@ -13,4 +13,8 @@ Rails.application.routes.draw do
       end
     end
   end
+  get 'games/:id/reload_board', to: 'games#reload_board'
+
+  # Serve websocket cable requests in-process
+  mount ActionCable.server => '/cable'
 end
