@@ -63,3 +63,5 @@ gem 'bootstrap', '~> 4.1.1'
 gem 'devise'
 gem 'simple_form'
 gem 'jquery-ui-rails'
+
+gem 'will_paginate', '~> 3.1.0'

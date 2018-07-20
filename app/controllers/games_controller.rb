@@ -2,7 +2,7 @@ class GamesController < ApplicationController
   before_action :authenticate_user!, only: [:new, :create, :update, :destroy, :forfeit]
 
   def index
-    @games = Game.available
+    @games = Game.available.paginate(:page => params[:page], :per_page => 6)
   end
 
   def new

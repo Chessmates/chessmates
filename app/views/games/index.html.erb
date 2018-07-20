@@ -1,20 +1,20 @@
 <div class ="games-list">
-  <h3>Available Games</h3>
-
-  <div class="card-deck">
-    <% @games.reverse.each do |game| %>
-      <div class="card">
-        <%= image_tag("chess.jpg", class: "card-img-top") %>
-        <div class="card-body">
-         <h4><%= game.game_name %></h4><br />
-         <h5 class ="game-creator">Created By: <%= game.white_player.username %></h5>
-         <br/>
-          <%= link_to 'Join Game', game_path(game), class: 'btn btn-success' %>
+  <h2>Available Games</h2>
+    <div class="card-columns">
+      <% @games.reverse.each do |game| %>
+        <div class="card text-center border-dark mb-3">
+          <%=image_tag Dir.new(Rails.root.to_s + "/app/assets/chess_pics").to_a.select{|c| c.downcase.match(/\.jpg|\.jpeg|\.png/) }.sample, class: "card-img-top" %>
+          <div class="card-body">
+           <h4><%= game.game_name %></h4>
+           <h6>Created By: <%= game.white_player.username %></h6>
+           <br/>
+           <%= link_to 'Join Game', game_path(game), class: 'btn btn-success' %>
+          </div>
         </div>
-      </div>
-    <% end %>
-  </div>
+      <% end %>
+    </div>
 </div>
 
-    
+<%= will_paginate @games, class: '.flickr_pagination' %>
 
+    
