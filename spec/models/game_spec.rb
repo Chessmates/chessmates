@@ -65,6 +65,7 @@ RSpec.describe Game, type: :model do
     bqueen = Queen.create(game_id: game.id, location_x: 3, location_y: 3, white: false, notcaptured: true)
 
     expect(game.threatning_piece(king).present?).to be true
+    puts game.endangers_king?(true)
   end
 
   it "determines if the game is in check or not" do

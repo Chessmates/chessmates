@@ -4,31 +4,37 @@ class Piece < ApplicationRecord
   scope :active, -> { where(notcaptured: true) }
 
   def valid_move?(x,y)
-    return false if self.game.forfeited? || !self.opponent_piece?(x,y) # OR King is in check after move
-    destination_on_board?(x,y)
-  end
-
-  def occupied?(x,y)
-    if game.pieces.find_by(location_x: x, location_y: y)
-      return true
-    else
-      return false
-    end
-  end
-
-  def opponent_piece?(x,y)
-    piece_at_x_y = game.pieces.find_by(location_x: x, location_y: y)
-    return false if piece_at_x_y && (self.white == piece_at_x_y.white)
+    return false if self.game.forfeited? ||  ! destination_on_board?(x,y) || piece_at_destination(x,y) && ! opponent_piece?(x,y)
     return true
   end
 
-  def move_to!(new_x,new_y)
-    piece_at_x_y = game.pieces.find_by(location_x: new_x, location_y: new_y)
+  # def move_endangers_king(x,y)
+  #   ActiveRecord::Base.transaction do
+  #     self.update!(location_x: x, location_y: y, has_moved: true)
+  #     if self.game.check?(self.white)
+  #       raise ActiveRecord::Rollback
+  #     end
+  #   end
+  #   puts "Your King would be exposed!!!"
+  # end
 
-    if self.valid_move?(new_x, new_y)
-      if piece_at_x_y
+  def piece_at_destination(x,y)
+    game.pieces.find_by(location_x: x, location_y: y)
+  end
+
+  def opponent_piece?(x,y)
+    if piece_at_destination(x,y)
+      return false if self.white == piece_at_destination(x,y).white
+      return true if self.white != piece_at_destination(x,y).white
+    end
+  end
+
+
+  def move_to!(new_x,new_y)
+    if valid_move?(new_x, new_y)
+      if piece_at_destination(new_x, new_y)
         if opponent_piece?(new_x, new_y)
-          piece_at_x_y.update_attributes(notcaptured: false, location_x: nil, location_y: nil)
+          piece_at_destination(new_x, new_y).update_attributes(notcaptured: false, location_x: nil, location_y: nil)
           self.update_attributes(location_x: new_x, location_y: new_y, has_moved: true)
         end
       else
@@ -194,7 +200,6 @@ class Piece < ApplicationRecord
     end
 
     range = (mini+1..maxi-1)
-    # obstruct_locations = []
 
     range.each do |i|
       obstruct_locations << [self.location_x, i]
@@ -220,7 +225,6 @@ class Piece < ApplicationRecord
     end 
 
     range = (mini+1..maxi-1)
-    # obstruct_locations = []
 
     range.each do |i|
       obstruct_locations << [i, self.location_y]
@@ -238,28 +242,24 @@ class Piece < ApplicationRecord
 
   def diagonal_places(king,obstruct_locations=[])
     if (self.location_x > king.location_x) && (self.location_y < king.location_y)
-      # obstruct_locations = []
       a = 1
       while a < (self.location_x - king.location_x).abs
         obstruct_locations << [king.location_x + a, king.location_y - a]
         a = a + 1
       end
     elsif (self.location_x > king.location_x) && (self.location_y > king.location_y)
-      # obstruct_locations = []
       a = 1
       while a < (self.location_x - king.location_x).abs
         obstruct_locations << [king.location_x + a, king.location_y + a]
         a = a + 1
       end
     elsif (self.location_x < king.location_x) && (self.location_y > king.location_y)
-      # obstruct_locations = []
       a = 1
       while a < (self.location_x - king.location_x).abs
         obstruct_locations << [king.location_x - a, king.location_y + a]
         a = a + 1
       end
     elsif (self.location_x < king.location_x) && (self.location_y < king.location_y)
-      # obstruct_locations = []
       a = 1
       while a < (self.location_x - king.location_x).abs
         obstruct_locations << [king.location_x - a, king.location_y - a]

@@ -93,15 +93,15 @@ RSpec.describe Piece, type: :model do
     game.pieces.find_by(location_x: 0, location_y: 1).destroy
     game.pieces.find_by(location_x: 0, location_y: 6).destroy
     whiteRook = game.pieces.find_by(location_x:0, location_y: 0)
-    dest = game.pieces.find_by(location_x: 0, location_y: 7) # this is blackRook
+    opponent = game.pieces.find_by(location_x: 0, location_y: 7) # this is blackRook
 
     whiteRook.move_to!(0,7)
     whiteRook.reload
-    dest.reload
+    opponent.reload
    
-    expect(dest.notcaptured).to be false
-    expect(dest.location_x).to be nil
-    expect(dest.location_y).to be nil
+    expect(opponent.notcaptured).to be false
+    expect(opponent.location_x).to be nil
+    expect(opponent.location_y).to be nil
     expect(whiteRook.location_x).to eq(0)
     expect(whiteRook.location_y).to eq(7) 
   end
@@ -109,11 +109,11 @@ RSpec.describe Piece, type: :model do
   it "cannot assume new position if a piece's destination is occupied by own piece" do
     game = FactoryBot.create(:game)
     whiteRook = game.pieces.find_by(location_x:0, location_y: 0)
-    dest = game.pieces.find_by(location_x: 7, location_y: 1)
+    friendly = game.pieces.find_by(location_x: 1, location_y: 0)
 
-    whiteRook.move_to!(7,1)
+    whiteRook.move_to!(1,0)
 
-    expect(dest.notcaptured).to be true
+    expect(friendly.notcaptured).to be true
     expect(whiteRook.location_x).to eq(0)
     expect(whiteRook.location_y).to eq(0) 
   end
@@ -124,6 +124,7 @@ RSpec.describe Piece, type: :model do
     whiteRook = game.pieces.find_by(location_x: 0, location_y: 0)
     
     whiteRook.move_to!(0,3)
+    whiteRook.reload
 
     expect(whiteRook.location_x).to eq(0)
     expect(whiteRook.location_y).to eq(3) 
@@ -216,5 +217,22 @@ RSpec.describe Piece, type: :model do
     expect(bQ1.can_be_blocked?(wKi)).to be false
     expect(bP.can_be_blocked?(wKi)).to be false
     expect(bB.can_be_blocked?(wKi)).to be false
+  end
+
+  it "rejects any move that would place the game in check" do
+    game = FactoryBot.create(:game)
+    game.pieces.destroy_all
+
+    wKi = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    wP1 = Pawn.create(game_id: game.id, location_x: 2, location_y: 0, white: true, notcaptured: true)
+    wP2 = Pawn.create(game_id: game.id, location_x: 2, location_y: 1, white: true, notcaptured: true)
+    wP3 = Pawn.create(game_id: game.id, location_x: 3, location_y: 1, white: true, notcaptured: true)
+    wP4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
+    wP5 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
+    bB = Bishop.create(game_id: game.id, location_x: 0, location_y: 3, white: false, notcaptured: true)
+
+    # puts "Old Location X: #{wP2.location_x}; Old Location Y: #{wP2.location_y}"
+    # wP2.move_endangers_king(2,2)
+    # puts "New Location X: #{wP2.location_x}; New Location Y: #{wP2.location_y}"
   end
 end

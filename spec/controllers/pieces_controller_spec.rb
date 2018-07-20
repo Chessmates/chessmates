@@ -93,13 +93,33 @@ RSpec.describe PiecesController, type: :controller do
     end
 
     it "should return a Forbidden(403) error if the piece's move is invalid" do
-      whiteRook = FactoryBot.create(:piece, location_x: 0, location_y: 2)
+      game = FactoryBot.create(:game)
+      game.pieces.find_by(location_x: 1, location_y: 1).destroy
+      whiteRook = game.pieces.find_by(location_x: 0, location_y: 0)
       sign_in whiteRook.game.white_player
 
-      patch :update, params: { game_id: whiteRook.game.id, id: whiteRook.id, piece: { location_x: 2, location_y: 4, has_moved: true } }
+      patch :update, params: { game_id: game.id, id: whiteRook.id, piece: { location_x: 2, location_y: 2, has_moved: true } }
 
-      puts response.status
+      expect(response).to have_http_status(:forbidden)
+    end
 
+    # it "should return a Forbidden(403) error if the piece's move places its King in check" do
+    #   game = FactoryBot.create(:game)
+    #   game.pieces.destroy_all
+
+    #   wKi = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    #   wP1 = Pawn.create(game_id: game.id, location_x: 2, location_y: 0, white: true, notcaptured: true)
+    #   wP2 = Pawn.create(game_id: game.id, location_x: 2, location_y: 1, white: true, notcaptured: true)
+    #   wP3 = Pawn.create(game_id: game.id, location_x: 3, location_y: 1, white: true, notcaptured: true)
+    #   wP4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
+    #   wP5 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
+    #   bB = Bishop.create(game_id: game.id, location_x: 0, location_y: 3, white: false, notcaptured: true)
+
+    #   sign_in game.white_player
+
+    #   patch :update, params: { game_id: game.id, id: wP2.id, piece: { location_x: 2, location_y: 2, has_moved: true } }
+
+    #   puts response.body
       # expect(response).to have_http_status(:forbidden)
     end
   end

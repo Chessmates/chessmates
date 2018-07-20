@@ -12,7 +12,7 @@
 <% end %>
 
 <!-- Display "DELETE GAME" button to Game Creator -->
-<% if current_user && current_user == @game.white_player %>
+<% if current_user == @game.white_player && @game.black_player.nil? %>
   <%= link_to 'Delete Your Game', game_path(@game), method: :delete, data: {confirm: 'Are you SURE you want to DELETE your game?'}, class: 'btn btn-danger' %>
 <% end %>
 <br /><br />
@@ -36,26 +36,8 @@
 <% end %>
 
 <!-- GAME CHESSBOARD -->
-<div class="chessboard">
-  <% (0..7).each do |col| %>
-    <% (0..7).each do |row| %>
-      <% @piece = @game.pieces_by_col_then_row[col][row] %>
-      <% if @piece.nil? %>
-        <% if ((row % 2 == 0) && (col % 2 == 0)) || ((row % 2 != 0) && (col % 2 != 0)) %>
-          <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"></div>
-        <% else %>
-          <div class="black droppable" data-x="<%= row %>" data-y="<%= col %>"></div>
-        <% end %>
-      <% else %>
-        <% if ((row % 2 == 0) && (col % 2 == 0)) || ((row % 2 != 0) && (col % 2 != 0)) %>
-          <div class="white droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable whitered" id="piece_<%= @piece.id %>" data-piece="<%= @piece.id %>" data-type="<%= @piece.type %>" data-white="<%= @piece.white %>" data-moved="<%= @piece.has_moved %>" data-notcaptured="<%= @piece.notcaptured %>"><%= @piece.picture.html_safe %></span></div>
-        <% else %>
-          <div class="black droppable" data-x="<%= row %>" data-y="<%= col %>"><span class="draggable" id="piece_<%= @piece.id %>" data-piece="<%= @piece.id %>" data-type="<%= @piece.type %>" data-white="<%= @piece.white %>" data-moved="<%= @piece.has_moved %>" data-notcaptured="<%= @piece.notcaptured %>"><%= @piece.picture.html_safe %></span></div>
-        <% end %>
-      <% end %>
-    <% end %>
-  <% end %>
-</div>
+<div class="reloadboard"><%= render "chessboard", :locals => {:game => @game} %></div>
+
 
 <% white_king = @game.pieces.find_by(location_x: 3, location_y: 0, type: "King", white: true, has_moved: false) %>
 <% black_king = @game.pieces.find_by(location_x: 3, location_y: 7, type: "King", white: false, has_moved: false) %>

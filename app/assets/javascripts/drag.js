@@ -29,6 +29,24 @@ $(function() {
         of: piece_destination
       });
 
+      function afterSuccess(){
+        $("#piece_" + pieceId).attr("data-moved","true");
+
+        if ( $(piece_destination)[0].childNodes[0] ){
+          var piece_at_target = $(piece_destination)[0].childNodes[0].id;
+          var piece_at_target_white = $(piece_destination)[0].childNodes[0].attributes[4].value;
+          var moving_piece_white = $("#piece_" + pieceId)[0].attributes[4].value;
+
+          if (piece_at_target_white != moving_piece_white){
+            $("#" + piece_at_target).effect("shake", {direction: "right", times: 5, distance: 30}, 1000).fadeOut();
+          };
+        };
+      }
+
+      function afterError(){
+        $("#piece_" + pieceId).addClass("revertPiece");
+      }
+
       $.ajax({
         url: url,
         async: false, // considered bad practice, but couldn't figure out any other way :(
@@ -37,26 +55,8 @@ $(function() {
         idOfPiece: pieceId,
         pieceDest: piece_destination,
         data: { piece: { location_x: x, location_y: y, has_moved: true } },
-        success: function(data, textStatus, jqXHR){
-          var piece_id = this.idOfPiece;
-          $("#piece_" + piece_id).attr("data-moved","true");
-
-          var piece_dest = this.pieceDest;
-
-          if ( $(piece_dest)[0].childNodes[0] ){
-            var piece_at_target = $(piece_dest)[0].childNodes[0].id;
-            var piece_at_target_white = $(piece_dest)[0].childNodes[0].attributes[4].value;
-            var moving_piece_white = $("#piece_" + piece_id)[0].attributes[4].value;
-
-            if (piece_at_target_white != moving_piece_white){
-              $("#" + piece_at_target).effect("shake", {direction: "right", times: 5, distance: 30}, 1000).fadeOut();
-            };
-          };
-        },
-        error: function(jqXHR, textStatus, errorMsg){
-          var piece_id = this.idOfPiece;
-          $("#piece_" + piece_id).addClass("revertPiece"); 
-        }
+        success: afterSuccess, 
+        error: afterError 
       });
     }
   });
