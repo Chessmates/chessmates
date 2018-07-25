@@ -4,19 +4,21 @@ class Piece < ApplicationRecord
   scope :active, -> { where(notcaptured: true) }
 
   def valid_move?(x,y)
-    return false if self.game.forfeited? ||  ! destination_on_board?(x,y) || piece_at_destination(x,y) && ! opponent_piece?(x,y)
+    return false if self.game.forfeited? ||  ! destination_on_board?(x,y) || friendly_at_destination(x,y) || piece_didnt_move(x,y) || move_endangers_king(x,y)
     return true
   end
 
-  # def move_endangers_king(x,y)
-  #   ActiveRecord::Base.transaction do
-  #     self.update!(location_x: x, location_y: y, has_moved: true)
-  #     if self.game.check?(self.white)
-  #       raise ActiveRecord::Rollback
-  #     end
-  #   end
-  #   puts "Your King would be exposed!!!"
-  # end
+  def move_endangers_king(x,y)
+    current_location = [self.location_x, self.location_y]
+    begin
+      self.update(location_x: x, location_y: y, has_moved: true)
+      reload
+      king_in_check = self.game.check?(self.white)
+    ensure
+      self.update(location_x: current_location.first, location_y: current_location.last)
+    end
+    return king_in_check
+  end
 
   def piece_at_destination(x,y)
     game.pieces.find_by(location_x: x, location_y: y)
@@ -27,6 +29,14 @@ class Piece < ApplicationRecord
       return false if self.white == piece_at_destination(x,y).white
       return true if self.white != piece_at_destination(x,y).white
     end
+  end
+
+  def friendly_at_destination(x,y)
+    piece_at_destination(x,y) && !opponent_piece?(x,y)
+  end
+
+  def piece_didnt_move(x,y)
+    self.location_x == x && self.location_y == y
   end
 
 
@@ -147,39 +157,35 @@ class Piece < ApplicationRecord
     return false
   end
 
-  def can_be_captured?
-    opponents = game.pieces.where(white: !self.white, notcaptured: true)
-    answer = false
-    opponents.each do |opponent|
-      if opponent.valid_move?(self.location_x, self.location_y)
-        answer = true
-      end
-    end
-    return answer
+  def can_complete_threat?(opposite_piece)
+    self.valid_path?(opposite_piece.location_x,opposite_piece.location_y) && !self.is_obstructed?(opposite_piece.location_x,opposite_piece.location_y)
   end
 
-  def can_be_blocked?(king,obstruct_locations=[])
+  def can_be_blocked?(king,blockable_locations=[])
     return false if self.type == "Knight" # Knights can't be blocked
     return false if (self.location_x - king.location_x).abs == 1 || (self.location_y - king.location_y).abs == 1
 
     if self.vertical_path_to(king)
-      self.vertical_places(king,obstruct_locations)
+      self.vertical_places(king,blockable_locations)
     elsif self.horizontal_path_to(king)
-      self.horizontal_places(king,obstruct_locations)
+      self.horizontal_places(king,blockable_locations)
     elsif self.diagonal_path_to(king)
-      self.diagonal_places(king,obstruct_locations)
+      self.diagonal_places(king,blockable_locations)
     end
 
     friendlies = game.pieces.where(white: king.white, notcaptured: true).where.not(type: "King")
-    answer = false
-    obstruct_locations.each do |x,y|
-      friendlies.each do |friendly|
-        if friendly.valid_move?(x,y)
-          answer = true
+    answers = []
+    friendlies.each do |f|
+      blockable_locations.each do |x,y|
+        if f.valid_path?(x,y) && !f.is_obstructed?(x,y)
+          answers.push(true)
+        else
+          answers.push(false)
         end
       end
     end
-    return answer
+    return true if answers.include?(true)
+    return false
   end
 
   def vertical_path_to(king)
@@ -190,7 +196,7 @@ class Piece < ApplicationRecord
     end
   end
 
-  def vertical_places(king,obstruct_locations=[])
+  def vertical_places(king,blockable_locations=[])
     if self.location_y < king.location_y
       mini = self.location_y
       maxi = king.location_y
@@ -202,9 +208,9 @@ class Piece < ApplicationRecord
     range = (mini+1..maxi-1)
 
     range.each do |i|
-      obstruct_locations << [self.location_x, i]
+      blockable_locations << [self.location_x, i]
     end
-    return obstruct_locations
+    return blockable_locations
   end
 
   def horizontal_path_to(king)
@@ -215,7 +221,7 @@ class Piece < ApplicationRecord
     end
   end
 
-  def horizontal_places(king,obstruct_locations=[])
+  def horizontal_places(king,blockable_locations=[])
     if self.location_x < king.location_x
       mini = self.location_x
       maxi = king.location_x
@@ -227,9 +233,9 @@ class Piece < ApplicationRecord
     range = (mini+1..maxi-1)
 
     range.each do |i|
-      obstruct_locations << [i, self.location_y]
+      blockable_locations << [i, self.location_y]
     end
-    return obstruct_locations
+    return blockable_locations
   end
 
   def diagonal_path_to(king)
@@ -240,32 +246,32 @@ class Piece < ApplicationRecord
     end
   end
 
-  def diagonal_places(king,obstruct_locations=[])
+  def diagonal_places(king,blockable_locations=[])
     if (self.location_x > king.location_x) && (self.location_y < king.location_y)
       a = 1
       while a < (self.location_x - king.location_x).abs
-        obstruct_locations << [king.location_x + a, king.location_y - a]
+        blockable_locations << [king.location_x + a, king.location_y - a]
         a = a + 1
       end
     elsif (self.location_x > king.location_x) && (self.location_y > king.location_y)
       a = 1
       while a < (self.location_x - king.location_x).abs
-        obstruct_locations << [king.location_x + a, king.location_y + a]
+        blockable_locations << [king.location_x + a, king.location_y + a]
         a = a + 1
       end
     elsif (self.location_x < king.location_x) && (self.location_y > king.location_y)
       a = 1
       while a < (self.location_x - king.location_x).abs
-        obstruct_locations << [king.location_x - a, king.location_y + a]
+        blockable_locations << [king.location_x - a, king.location_y + a]
         a = a + 1
       end
     elsif (self.location_x < king.location_x) && (self.location_y < king.location_y)
       a = 1
       while a < (self.location_x - king.location_x).abs
-        obstruct_locations << [king.location_x - a, king.location_y - a]
+        blockable_locations << [king.location_x - a, king.location_y - a]
         a = a + 1
       end
     end
-    return obstruct_locations
+    return blockable_locations
   end
 end
