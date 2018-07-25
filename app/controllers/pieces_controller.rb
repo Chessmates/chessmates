@@ -20,6 +20,10 @@ class PiecesController < ApplicationController
     return render_not_found(:forbidden) if !piece.valid_move?(dest_x,dest_y)
 
     piece.move_to!(dest_x,dest_y)
+
+    ActionCable.server.broadcast 'moves',
+        game_id: piece.game.id
+      head :ok
   end
 
   def castle
