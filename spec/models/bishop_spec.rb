@@ -4,7 +4,7 @@ RSpec.describe Bishop, type: :model do
   
   it "can move along a true diagonal path" do
     game = FactoryBot.create(:game)
-    bishop = Bishop.create(game_id: game.id, location_x: 4, location_y: 3)
+    bishop = Bishop.create(game_id: game.id, location_x: 4, location_y: 3, white: true)
     move = bishop.valid_move?(6,5)
 
     expect(move).to be true
@@ -12,7 +12,7 @@ RSpec.describe Bishop, type: :model do
 
   it "cannot move along a non-true diagonal path" do
     game = FactoryBot.create(:game)
-    bishop = Bishop.create(game_id: game.id, location_x: 4, location_y: 3)
+    bishop = Bishop.create(game_id: game.id, location_x: 4, location_y: 3, white: true)
     move = bishop.valid_move?(7,4)
 
     expect(move).to be false
@@ -28,8 +28,8 @@ RSpec.describe Bishop, type: :model do
 
   it "cannot move past an obstruction" do
     game = FactoryBot.create(:game)
-    bishop = Bishop.create(game_id: game.id, location_x: 4, location_y: 3)
-    pawn = Pawn.create(game_id: game.id, location_x: 3, location_y: 4)
+    bishop = Bishop.create(game_id: game.id, location_x: 4, location_y: 3, white: true)
+    pawn = Pawn.create(game_id: game.id, location_x: 3, location_y: 4, white: false)
     move = bishop.valid_move?(2,5)
     
     expect(move).to be false

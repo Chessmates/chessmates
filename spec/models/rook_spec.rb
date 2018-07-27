@@ -4,14 +4,14 @@ RSpec.describe Rook, type: :model do
 
   it "can move vertically on board" do
     game = FactoryBot.create(:game)
-    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id)
+    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id, white: true)
 
     expect(rook.valid_move?(4,5)).to be true
   end
 
   it "can move horizontally on board" do
     game = FactoryBot.create(:game)
-    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id)
+    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id, white: true)
 
     expect(rook.valid_move?(1,3)).to be true
   end
@@ -25,7 +25,7 @@ RSpec.describe Rook, type: :model do
 
   it "cannot move past an obstruction" do
     game = FactoryBot.create(:game)
-    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id)
+    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id, white: true)
     pawn = Pawn.create(location_x: 2, location_y: 3, game_id: game.id)
 
     expect(rook.valid_move?(1,3)).to be false
@@ -33,7 +33,7 @@ RSpec.describe Rook, type: :model do
 
   it "cannot move non-linearly (true or false diagonal) on the board" do
     game = FactoryBot.create(:game)
-    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id)
+    rook = Rook.create(location_x: 4, location_y: 3, game_id: game.id, white: true)
 
     expect(rook.valid_move?(2,5)).to be false
     expect(rook.valid_move?(7,5)).to be false

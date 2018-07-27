@@ -36,7 +36,7 @@
 <% end %>
 
 <!-- GAME CHESSBOARD -->
-<div class="reloadboard"><%= render "chessboard", :locals => {:game => @game} %></div>
+<div class="reloadboard"><%= render "chessgrid", :locals => {:game => @game} %></div>
 
 
 <% white_king = @game.pieces.find_by(location_x: 3, location_y: 0, type: "King", white: true, has_moved: false) %>

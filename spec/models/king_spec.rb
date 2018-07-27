@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe King, type: :model do
 
-  # King_Movement Tests: START =============
+  # King Movement Tests: START =============
   it "shouldn't allow moves greater than 1 place at a time" do
     game = FactoryBot.create(:game)
     king = King.create(location_x: 4, location_y: 3, game_id: game.id)
@@ -15,7 +15,7 @@ RSpec.describe King, type: :model do
 
   it "should allow vertical, horizontal or diagonal moves of 1 place at a time" do
     game = FactoryBot.create(:game)
-    king = King.create(location_x: 4, location_y: 3, game_id: game.id)
+    king = King.create(location_x: 4, location_y: 3, game_id: game.id, white: true)
    
    expect(king.valid_move?(5,3)).to be true # horizontal
    expect(king.valid_move?(5,2)).to be true # true diagonal
@@ -39,8 +39,8 @@ RSpec.describe King, type: :model do
     game.reload
     white_king = game.pieces.find_by(location_x: 3, location_y: 0)
 
-    expect(white_king.can_castle?(0,0,true)).to be true # kingside castle
-    expect(white_king.can_castle?(7,0,true)).to be false # queenside castle
+    expect(white_king.can_castle?(0,0)).to be true # kingside castle
+    expect(white_king.can_castle?(7,0)).to be false # queenside castle
   end
 
   it "can castle with white_rook_queenside when all conditions met" do
@@ -51,8 +51,8 @@ RSpec.describe King, type: :model do
     game.reload
     white_king = game.pieces.find_by(location_x: 3, location_y: 0)
 
-    expect(white_king.can_castle?(0,0,true)).to be false # kingside castle
-    expect(white_king.can_castle?(7,0,true)).to be true # queenside castle
+    expect(white_king.can_castle?(0,0)).to be false # kingside castle
+    expect(white_king.can_castle?(7,0)).to be true # queenside castle
   end
 
   it "can castle with black_rook_kingside when all conditions met" do
@@ -62,8 +62,8 @@ RSpec.describe King, type: :model do
     game.reload
     black_king = game.pieces.find_by(location_x: 3, location_y: 7)
 
-    expect(black_king.can_castle?(0,7,true)).to be true # kingside castle
-    expect(black_king.can_castle?(7,7,true)).to be false # queenside castle
+    expect(black_king.can_castle?(0,7)).to be true # kingside castle
+    expect(black_king.can_castle?(7,7)).to be false # queenside castle
   end
 
   it "can castle with black_rook_queenside when all conditions met" do
@@ -74,8 +74,8 @@ RSpec.describe King, type: :model do
     game.reload
     black_king = game.pieces.find_by(location_x: 3, location_y: 7)
 
-    expect(black_king.can_castle?(0,7,true)).to be false # kingside castle
-    expect(black_king.can_castle?(7,7,true)).to be true # queenside castle
+    expect(black_king.can_castle?(0,7)).to be false # kingside castle
+    expect(black_king.can_castle?(7,7)).to be true # queenside castle
   end
 
   it "castles with white_rook_kingside if can_castle" do
@@ -156,6 +156,8 @@ RSpec.describe King, type: :model do
     wpawn3 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
     wpawn4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
 
+    bking = King.create(game_id: game.id, location_x: 3, location_y: 7, white: false, notcaptured: true)
+
     expect(wking.can_escape_check?).to be true
   end
 
@@ -169,6 +171,8 @@ RSpec.describe King, type: :model do
     wpawn2 = Pawn.create(game_id: game.id, location_x: 2, location_y: 0, white: true, notcaptured: true)
     wpawn3 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
     wpawn4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
+
+    bking = King.create(game_id: game.id, location_x: 3, location_y: 7, white: false, notcaptured: true)
 
     expect(wking.can_escape_check?).to be false
   end

@@ -156,7 +156,7 @@ RSpec.describe Piece, type: :model do
     piece.move_to!(3,4)
   end
 
-  it "determines if a threatening piece can be captured" do
+  it "determines if a threatening piece can accomplish their threat" do
     game = FactoryBot.create(:game)
     game.pieces.destroy_all
 
@@ -166,7 +166,8 @@ RSpec.describe Piece, type: :model do
     wpawn2 = Pawn.create(game_id: game.id, location_x: 0, location_y: 1, white: true, notcaptured: true)
     wRook = Rook.create(game_id: game.id, location_x: 3, location_y: 2, white: true, notcaptured: true)
 
-    expect(bqueen.can_be_captured?).to be true
+    expect(bqueen.can_complete_threat?(wking)).to be true
+    expect(wRook.can_complete_threat?(bqueen)).to be true
   end
 
   it "determines if a threatening piece cannot be captured" do
@@ -179,7 +180,8 @@ RSpec.describe Piece, type: :model do
     wpawn2 = Pawn.create(game_id: game.id, location_x: 0, location_y: 1, white: true, notcaptured: true)
     wKnight = Knight.create(game_id: game.id, location_x: 3, location_y: 2, white: true, notcaptured: true)
 
-    expect(bqueen.can_be_captured?).to be false
+    expect(bqueen.can_complete_threat?(wking)).to be true
+    expect(wKnight.can_complete_threat?(bqueen)).to be false
   end
 
   it "determines if a threatening piece can be blocked" do
@@ -189,14 +191,15 @@ RSpec.describe Piece, type: :model do
     wKi = King.create(game_id: game.id, location_x: 3, location_y: 3, white: true, notcaptured: true)
     wR1 = Rook.create(game_id: game.id, location_x: 4, location_y: 5, white: true, notcaptured: true)
     wR2 = Rook.create(game_id: game.id, location_x: 1, location_y: 1, white: true, notcaptured: true)
-    bQ2 = Queen.create(game_id: game.id, location_x: 6, location_y: 6, white: false, notcaptured: true)
-    bQ3 = Queen.create(game_id: game.id, location_x: 3, location_y: 7, white: false, notcaptured: true)
+
+    bQ1 = Queen.create(game_id: game.id, location_x: 6, location_y: 6, white: false, notcaptured: true)
+    bQ2 = Queen.create(game_id: game.id, location_x: 3, location_y: 7, white: false, notcaptured: true)
     bB1 = Bishop.create(game_id: game.id, location_x: 0, location_y: 6, white: false, notcaptured: true)
     bR1 = Rook.create(game_id: game.id, location_x: 0, location_y: 3, white: false, notcaptured: true)
     bR2 = Rook.create(game_id: game.id, location_x: 3, location_y: 0, white: false, notcaptured: true)
 
+    expect(bQ1.can_be_blocked?(wKi)).to be true
     expect(bQ2.can_be_blocked?(wKi)).to be true
-    expect(bQ3.can_be_blocked?(wKi)).to be true
     expect(bB1.can_be_blocked?(wKi)).to be true
     expect(bR1.can_be_blocked?(wKi)).to be true
     expect(bR2.can_be_blocked?(wKi)).to be true
@@ -207,9 +210,10 @@ RSpec.describe Piece, type: :model do
     game.pieces.destroy_all
 
     wKi = King.create(game_id: game.id, location_x: 3, location_y: 3, white: true, notcaptured: true)
+    wB = Bishop.create(game_id: game.id, location_x: 4, location_y: 5, white: true, notcaptured: true)
+
     bQ1 = Queen.create(game_id: game.id, location_x: 4, location_y: 3, white: false, notcaptured: true)
     bQ2 = Queen.create(game_id: game.id, location_x: 6, location_y: 6, white: false, notcaptured: true)
-    wB = Bishop.create(game_id: game.id, location_x: 4, location_y: 5, white: true, notcaptured: true)
     bP = Pawn.create(game_id: game.id, location_x: 4, location_y: 2, white: false, notcaptured: true)
     bB = Bishop.create(game_id: game.id, location_x: 2, location_y: 2, white: false, notcaptured: true)
 
@@ -223,16 +227,16 @@ RSpec.describe Piece, type: :model do
     game = FactoryBot.create(:game)
     game.pieces.destroy_all
 
-    wKi = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
+    wKing = King.create(game_id: game.id, location_x: 3, location_y: 0, white: true, notcaptured: true)
     wP1 = Pawn.create(game_id: game.id, location_x: 2, location_y: 0, white: true, notcaptured: true)
     wP2 = Pawn.create(game_id: game.id, location_x: 2, location_y: 1, white: true, notcaptured: true)
     wP3 = Pawn.create(game_id: game.id, location_x: 3, location_y: 1, white: true, notcaptured: true)
     wP4 = Pawn.create(game_id: game.id, location_x: 4, location_y: 1, white: true, notcaptured: true)
     wP5 = Pawn.create(game_id: game.id, location_x: 4, location_y: 0, white: true, notcaptured: true)
     bB = Bishop.create(game_id: game.id, location_x: 0, location_y: 3, white: false, notcaptured: true)
+    # LOL this test kept failing because the black Bishop didn't have its King to apply "move_endangers_king" method to
+    bKing = King.create(game_id: game.id, location_x: 3, location_y: 7, white: false, notcaptured: true)
 
-    # puts "Old Location X: #{wP2.location_x}; Old Location Y: #{wP2.location_y}"
-    # wP2.move_endangers_king(2,2)
-    # puts "New Location X: #{wP2.location_x}; New Location Y: #{wP2.location_y}"
+    expect(wP2.valid_move?(2,2)).to be false
   end
 end

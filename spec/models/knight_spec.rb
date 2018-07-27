@@ -4,7 +4,7 @@ RSpec.describe Knight, type: :model do
 
   it "disallows any moves that are not L-Shaped (1 by 2 places)" do
     game = FactoryBot.create(:game)
-    knight = Knight.create(location_x: 6, location_y: 3, game_id: game.id)
+    knight = Knight.create(location_x: 6, location_y: 3, game_id: game.id, white: true)
 
     twostep_horiz = knight.valid_move?(4,3)
     twostep_diag = knight.valid_move?(4,5)
@@ -25,7 +25,7 @@ RSpec.describe Knight, type: :model do
 
   it "allows any moves that are L-Shaped (1 by 2 places)" do
     game = FactoryBot.create(:game)
-    knight = Knight.create(location_x: 6, location_y: 3, game_id: game.id)
+    knight = Knight.create(location_x: 6, location_y: 3, game_id: game.id, white: true)
 
     move1 = knight.valid_move?(7,5)
     move2 = knight.valid_move?(5,5)
@@ -40,9 +40,9 @@ RSpec.describe Knight, type: :model do
 
   it "allows any moves that are obstructed (i.e. jump over pieces)" do
     game = FactoryBot.create(:game)
-    knight = Knight.create(location_x: 6, location_y: 3, game_id: game.id)
-    pawn1 = Pawn.create(location_x: 5, location_y: 3, game_id: game.id)
-    pawn2 = Pawn.create(location_x: 6, location_y: 5, game_id: game.id)
+    knight = Knight.create(location_x: 6, location_y: 3, game_id: game.id, white: true)
+    pawn1 = Pawn.create(location_x: 5, location_y: 3, game_id: game.id, white: true)
+    pawn2 = Pawn.create(location_x: 6, location_y: 5, game_id: game.id, white: true)
 
     move1 = knight.valid_move?(4,2)
     move2 = knight.valid_move?(5,5)

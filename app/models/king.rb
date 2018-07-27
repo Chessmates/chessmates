@@ -1,8 +1,8 @@
 class King < Piece
 
   def valid_move?(x,y)
-    return false unless super
     return false unless valid_path?(x,y)
+    return false unless super
     return true
   end
 
@@ -20,21 +20,17 @@ class King < Piece
     range = (-1..1)
     range.each do |i|
       range.each do |j|
-        next if ( [i,j] == [0,0] || !destination_on_board?(self.location_x + i,self.location_y + j) )
+        next if ( [i,j] == [0,0] || !destination_on_board?(self.location_x + i,self.location_y + j) || friendly_at_destination(self.location_x + i,self.location_y + j) )
         escape_locations << [self.location_x + i,self.location_y + j]
       end
     end
 
-
-
-    threats.each do |threat|
-      answer = false
-      escape_locations.each do |x, y|
-        if self.valid_move?(x,y) && !threat.valid_move?(x,y)
-          answer = true
-        end
+    escape_locations.each do |x,y|
+      if threats.any? { |threat| threat.valid_move?(x,y) }
+        return false
+      else
+        return true
       end
-      return answer
     end
   end
 

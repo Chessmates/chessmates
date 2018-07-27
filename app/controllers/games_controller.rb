@@ -75,7 +75,7 @@ class GamesController < ApplicationController
 
   def reload_board
     @game = Game.find_by_id(params[:id])
-    render :partial => "chessboard", :locals => {:game => @game}
+    render :partial => "chessgrid", :locals => {:game => @game}
   end
 
   private

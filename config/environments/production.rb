@@ -1,6 +1,10 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # ActionCable Heroku Settings
+  config.web_socket_server_url = "wss://chessmates.herokuapp.com/cable"
+  config.action_cable.allowed_request_origins = ['https://chessmates.herokuapp.com', 'http://chessmates.herokuapp.com'] 
+
   # Code is not reloaded between requests.
   config.cache_classes = true
 
